@@ -2,7 +2,7 @@
 session_start(); // Start the session
 
 // Check if the user is logged in and is a teacher
-if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower($_SESSION["user_role"]) !== 'teacher') {
+if (!isset($_SESSION["user_id"]) || strtolower($_SESSION["user_role"]) !== 'teacher') {
     die("Access denied: Unauthorized user.");
 }
 
@@ -23,48 +23,22 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["pdf_file"]) && isset($_POST['sub_id'])) {
     $sub_id = $_POST['sub_id'];
     $target_dir = __DIR__ . "/uploads/";
-    $file_name = basename($_FILES["pdf_file"]["name"]);
-    $target_file = $target_dir . $file_name; // ชื่อไฟล์ที่อัปโหลด
+    $target_file = $target_dir . basename($_FILES["pdf_file"]["name"]);
     $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
     // Check if the file is a PDF
     if ($file_type !== "pdf") {
         echo "Sorry, only PDF files are allowed.";
     } else {
-        // Fetch the current file path from the database
-        $sql = "SELECT pdf_path FROM exam WHERE sub_id = ?";
-        $stmt = $conn->prepare($sql);
-        if ($stmt === false) {
-            die("SQL Error: " . $conn->error);
-        }
-        $stmt->bind_param("i", $sub_id);
-        $stmt->execute();
-        $stmt->bind_result($current_file_path);
-        $stmt->fetch();
-        $stmt->close();
-
-        // If there is a file already uploaded, delete it
-        if ($current_file_path) {
-            $old_file_path = $target_dir . $current_file_path;
-            if (file_exists($old_file_path)) {
-                unlink($old_file_path); // Delete the old file
-            }
-        }
-
         // Move the uploaded file to the specified directory
         if (move_uploaded_file($_FILES["pdf_file"]["tmp_name"], $target_file)) {
-            // Update the database with the new file path
+            // Update the database with the file path
             $sql = "UPDATE exam SET pdf_path = ? WHERE sub_id = ?";
             $stmt = $conn->prepare($sql);
-            if ($stmt === false) {
-                die("SQL Error: " . $conn->error);
-            }
-
-            // ใช้เส้นทางที่ต้องการบันทึกในฐานข้อมูล
-            $stmt->bind_param("si", $file_name, $sub_id);
+            $stmt->bind_param("si", $target_file, $sub_id);
 
             if ($stmt->execute()) {
-                echo "The file " . htmlspecialchars($file_name) . " has been uploaded.";
+                echo "The file " . basename($_FILES["pdf_file"]["name"]) . " has been uploaded.";
             } else {
                 echo "Sorry, there was an error uploading your file: " . $conn->error;
             }
@@ -99,20 +73,21 @@ JOIN
 JOIN 
     user u ON u.user_id = t.user_id
 WHERE 
-    t.user_id = ?";
+    t.user_id = ?
+";
 
+// Prepare and bind parameters
 $stmt = $conn->prepare($sql);
-if ($stmt === false) {
-    die("SQL Error: " . $conn->error);
-}
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Check result
 if ($result === false) {
     die("SQL Error: " . $conn->error);
 }
 
+// Fetch all rows
 $rows = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 $conn->close();
@@ -125,7 +100,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="adminstyles.css"> 
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
 
@@ -141,7 +116,13 @@ $conn->close();
         <h4>Dashboard</h4>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" href="#">ALL Subject</a>
+                <a class="nav-link active" href="#">Subject</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">Uploaded Subject</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">Unuploaded Subject</a>
             </li>
         </ul>
     </div>
@@ -181,18 +162,18 @@ $conn->close();
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
                     echo "<td>";
                     if ($row['pdf_path']) {
-                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank'>View File</a>";
+                        echo "<a href='" . htmlspecialchars($row['pdf_path']) . "' target='_blank'>View File</a>";
                     } else {
                         echo "No file uploaded";
                     }
                     echo "</td>";
                     echo "<td>
-                        <form action='' method='post' enctype='multipart/form-data'>
-                            <input type='file' name='pdf_file' accept='application/pdf' required>
-                            <input type='hidden' name='sub_id' value='" . htmlspecialchars($row['sub_id']) . "'>
-                            <button type='submit' class='btn btn-primary btn-sm' style='margin-top: 10px;'>Upload</button>
-                        </form>
-                    </td>";
+                            <form action='' method='post' enctype='multipart/form-data'>
+                                <input type='file' name='pdf_file' accept='application/pdf' required>
+                                <input type='hidden' name='sub_id' value='" . htmlspecialchars($row['sub_id']) . "'>
+                                <button type='submit' class='btn btn-primary btn-sm'>Upload</button>
+                            </form>
+                          </td>";
                     echo "</tr>";
                 }
             } else {

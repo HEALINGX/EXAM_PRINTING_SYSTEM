@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
        
         $_SESSION["user_id"] = $user_id;
         $_SESSION["email"] = $email;
+        $_SESSION["user_role"] = $user_role;
 
         
         switch ($user_role) {
@@ -41,10 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location: teacher.php");
                 break;
             case 'Technology':
-                header("Location: teah.php");
+                header("Location: Technology.php");
                 break;
             case 'ExamTech':
-                header("Location: examteach.php");
+                header("Location: examtech.php");
                 break;
             default:
                 echo "Invalid role.";

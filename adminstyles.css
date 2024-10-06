@@ -129,4 +129,20 @@ h2 {
     border-color: #009a74;
 }
 
+.input-group {
+    width: 100%; /* ให้ input group มีความกว้างเต็ม */
+}
+
+.input-group input[type='file'] {
+    flex: 1; /* ให้ input file ขยายเต็มที่ */
+}
+
+.input-group .input-group-append {
+    display: flex; /* ใช้ Flexbox เพื่อจัดเรียงให้ปุ่มอยู่ด้านขวา */
+}
+
+.input-group .btn {
+    min-width: 100px; /* กำหนดความกว้างขั้นต่ำของปุ่ม */
+}
+
 

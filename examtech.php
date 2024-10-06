@@ -20,26 +20,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-
-$items_per_page = 5;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) $page = 1;
-$offset = ($page - 1) * $items_per_page;
-
-
-$sql = "SELECT s.sub_id, s.sub_nameEN, e.exam_date, e.exam_start, e.exam_end, e.exam_room 
-        FROM subject s, exam e 
-        WHERE s.sub_id = e.sub_id 
-        LIMIT $items_per_page OFFSET $offset";
+$sql = "
+SELECT s.sub_id, s.sub_nameEN, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path 
+FROM subject s
+JOIN exam e ON s.sub_id = e.sub_id
+";
 $result = $conn->query($sql);
-
-
-$total_sql = "SELECT COUNT(*) as total FROM subject s, exam e WHERE s.sub_id = e.sub_id";
-$total_result = $conn->query($total_sql);
-$total_row = $total_result->fetch_assoc();
-$total_items = $total_row['total'];
-$total_pages = ceil($total_items / $items_per_page);
-
 
 if ($result === false) {
     die("SQL Error: " . $conn->error);
@@ -77,9 +63,9 @@ if ($result === false) {
 
 <!-- Main Content -->
 <main class="container mt-5 pt-10">
-    <h2>Download ExamFile</h2>
+    <h2>Download Exam File</h2>
     <div class="search-bar mb-3">
-        <input type="text" class="form-control" id="searchInput" placeholder="Search users..." onkeyup="searchUsers()">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search Subject..." onkeyup="searchUsers()">
     </div>
 
     <table class="table" id="userTable">
@@ -106,8 +92,17 @@ if ($result === false) {
                     echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
-                    $file_path = 'exam_files/' . htmlspecialchars($row['sub_id']) . '_exam.pdf'; 
-                    echo "<td><a href='" . $file_path . "' class='btn btn-primary' download>Download</a></td>";
+
+                    // ใช้ pdf_path ที่บันทึกในฐานข้อมูล
+                    $file_path = htmlspecialchars($row['pdf_path']);
+                    // กำหนดเส้นทางที่อยู่ของไฟล์
+                    $full_path = __DIR__ . "/uploads/" . $file_path; 
+                    if ($file_path && file_exists($full_path)) { // ตรวจสอบว่าไฟล์มีอยู่จริง
+                        echo "<td><a href='uploads/" . $file_path . "' class='btn btn-primary' download>Download</a></td>";
+                    } else {
+                        echo "<td>No file uploaded</td>";
+                    }
+
                     echo "<td>
                             <select class='form-control' onchange='updateStatus(this, \"" . htmlspecialchars($row['sub_id']) . "\")'>
                                 <option value='Not uploaded'>Not uploaded</option>
@@ -118,52 +113,22 @@ if ($result === false) {
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='8'>No users found</td></tr>"; 
+                echo "<tr><td colspan='8'>No subjects found</td></tr>"; 
             }
             ?>
         </tbody>
     </table>
 
-    <!-- Pagination -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <?php if ($page > 1): ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?php echo $page - 1; ?>" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            <?php endif; ?>
-
-            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
-                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                </li>
-            <?php endfor; ?>
-
-            <?php if ($page < $total_pages): ?>
-                <li class="page-item">
-                    <a class="page-link" href="?page=<?php echo $page + 1; ?>" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            <?php endif; ?>
-        </ul>
-    </nav>
-
 </main>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="search.js"></script>
-  
-    </script>
-    
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="search.js"></script>
+
 </body>
 </html>
 
-
 <?php
 $conn->close();
-?>
+?> 
