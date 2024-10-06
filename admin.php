@@ -29,7 +29,6 @@ if ($result === false) {
     die("SQL Error: " . $conn->error);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -40,7 +39,6 @@ if ($result === false) {
     <link rel="stylesheet" href="adminstyles.css"> 
 </head>
 <body>
-
 <!-- Navbar -->
 <header class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="#">Exam Printing</a>

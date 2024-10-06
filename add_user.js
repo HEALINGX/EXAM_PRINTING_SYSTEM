@@ -11,7 +11,7 @@ document.getElementById('addUserForm').onsubmit = function(e) {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "add_user.php", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
+    
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
             // รีเฟรชตารางผู้ใช้หรือแสดงข้อความสำเร็จ
