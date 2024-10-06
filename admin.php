@@ -160,8 +160,8 @@ if ($result === false) {
         </div>
     </div>
 
-    <table class="table table-bordered table-hover" id="userTable">
-        <thead class="thead-light">
+    <table class="table" id="userTable">
+        <thead class="thead-dark">
             <tr>
                 <th>Name</th>
                 <th>Tel</th>
@@ -198,7 +198,7 @@ if ($result === false) {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="searchUsers.js"></script>
+    <script src="search.js"></script>
     <script src="add_user.js"></script>
     <script src="Edit_user.js"></script>
     </body>
