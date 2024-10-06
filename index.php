@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
  
     if ($stmt->num_rows > 0 && md5($password) == $hashed_password) {
        
-        $_SESSION["user_id"] = $user_id;
+        $_SESSION["user_id"] = dsadasd$user_id;
         $_SESSION["email"] = $email;
 
         
