@@ -255,7 +255,7 @@ $conn->close();
     $.ajax({
         type: "POST",
         url: "update_status.php",
-        data: { sub_id: subId, status: status },
+        data: { sub_id: subId, exam_status: status },
         success: function(response) {
             console.log(response);
             // แสดงผลสถานะที่อัปเดตใน UI
