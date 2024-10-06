@@ -20,11 +20,27 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch users information from the database
-$sql = "SELECT s.sub_id,s.sub_nameEN,e.exam_date,e.exam_start,e.exam_end,e.exam_room from subject s,exam e where s.sub_id = e.sub_id;";
+
+$items_per_page = 5;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $items_per_page;
+
+
+$sql = "SELECT s.sub_id, s.sub_nameEN, e.exam_date, e.exam_start, e.exam_end, e.exam_room 
+        FROM subject s, exam e 
+        WHERE s.sub_id = e.sub_id 
+        LIMIT $items_per_page OFFSET $offset";
 $result = $conn->query($sql);
 
-// ตรวจสอบผลลัพธ์การดึงข้อมูล
+
+$total_sql = "SELECT COUNT(*) as total FROM subject s, exam e WHERE s.sub_id = e.sub_id";
+$total_result = $conn->query($total_sql);
+$total_row = $total_result->fetch_assoc();
+$total_items = $total_row['total'];
+$total_pages = ceil($total_items / $items_per_page);
+
+
 if ($result === false) {
     die("SQL Error: " . $conn->error);
 }
@@ -76,7 +92,7 @@ if ($result === false) {
                 <th>EXAM_END</th>
                 <th>EXAM_ROOM</th>
                 <th>Download</th>
-                <th>Status</th>   <!-- คอลัมน์สถานะ -->
+                <th>Status</th>   
             </tr>
         </thead>
         <tbody>
@@ -107,6 +123,34 @@ if ($result === false) {
             ?>
         </tbody>
     </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <?php if ($page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?php echo $page - 1; ?>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?php if ($i == $page) echo 'active'; ?>">
+                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                </li>
+            <?php endfor; ?>
+
+            <?php if ($page < $total_pages): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?php echo $page + 1; ?>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+
 </main>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
