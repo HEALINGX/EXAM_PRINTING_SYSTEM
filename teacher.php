@@ -53,14 +53,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["pdf_file"]) && isset(
 
         // Move the uploaded file to the specified directory
         if (move_uploaded_file($_FILES["pdf_file"]["tmp_name"], $target_file)) {
-            // Update the database with the new file path
-            $sql = "UPDATE exam SET pdf_path = ? WHERE sub_id = ?";
+            // Update the database with the new file path and change the status
+            $sql = "UPDATE exam SET pdf_path = ?, exam_status = 'Uploaded' WHERE sub_id = ?";
             $stmt = $conn->prepare($sql);
             if ($stmt === false) {
                 die("SQL Error: " . $conn->error);
             }
-
-            // ใช้เส้นทางที่ต้องการบันทึกในฐานข้อมูล
             $stmt->bind_param("si", $file_name, $sub_id);
 
             if ($stmt->execute()) {
@@ -163,42 +161,28 @@ $conn->close();
                 <th>Exam Time</th>
                 <th>Exam Status</th>
                 <th>Exam Room</th>
-                <th>Exam File</th>
                 <th>Upload File</th>
             </tr>
         </thead>
         <tbody>
-            <?php
-            if (count($rows) > 0) {
-                foreach ($rows as $row) {
-                    echo "<tr>";
-                    echo "<td>" . htmlspecialchars($row['sub_id']). "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_nameTH']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_nameEN']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_status']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
-                    echo "<td>";
-                    if ($row['pdf_path']) {
-                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank'>View File</a>";
-                    } else {
-                        echo "No file uploaded";
-                    }
-                    echo "</td>";
-                    echo "<td>
-                        <form action='' method='post' enctype='multipart/form-data'>
-                            <input type='file' name='pdf_file' accept='application/pdf' required>
-                            <input type='hidden' name='sub_id' value='" . htmlspecialchars($row['sub_id']) . "'>
-                            <button type='submit' class='btn btn-primary btn-sm' style='margin-top: 10px;'>Upload</button>
-                        </form>
-                    </td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='9'>No subjects found</td></tr>";
-            }
-            ?>
+        <?php foreach ($rows as $row): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($row['sub_id']); ?></td>
+                <td><?php echo htmlspecialchars($row['sub_nameTH']); ?></td>
+                <td><?php echo htmlspecialchars($row['sub_nameEN']); ?></td>
+                <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
+                <td><?php echo htmlspecialchars($row['exam_start']) . ' - ' . htmlspecialchars($row['exam_end']); ?></td>
+                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
+                <td><?php echo htmlspecialchars($row['exam_room']); ?></td>
+                <td>
+                    <form action="" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="sub_id" value="<?php echo htmlspecialchars($row['sub_id']); ?>">
+                        <input type="file" name="pdf_file" required>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endforeach; ?>
         </tbody>
     </table>
 </main>

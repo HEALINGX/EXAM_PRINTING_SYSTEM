@@ -1,0 +1,12 @@
+[2024-10-06 20:30:05] Form Data: sub_nameEN=Test, sub_nameTH=เทส, sub_semester=1, sub_section=A, sub_department=Science, sub_detail=asdasdasdsadasdas, exam_date=2024-10-08, exam_room=Room 123, exam_start=04:29, exam_end=06:30, teacher_id=5
+[2024-10-06 20:30:05] Subject inserted successfully with ID 13
+[2024-10-06 20:30:05] Exam inserted successfully for subject ID 13
+[2024-10-06 20:31:27] Form Data: sub_nameEN=Test4, sub_nameTH=เทส, sub_semester=1, sub_section=A, sub_department=dsadsade, sub_detail=asdasdasdsadasdas, exam_date=2024-10-08, exam_room=Room 123, exam_start=04:29, exam_end=06:30, teacher_id=2
+[2024-10-06 20:31:27] Subject inserted successfully with ID 14
+[2024-10-06 20:31:27] Exam inserted successfully for subject ID 14
+[2024-10-06 20:31:36] Request to delete subject with ID: 13
+[2024-10-06 20:31:36] Related exams for subject with ID 13 deleted successfully
+[2024-10-06 20:31:36] Subject with ID 13 deleted successfully
+[2024-10-06 20:32:02] Request to delete subject with ID: 14
+[2024-10-06 20:32:02] Related exams for subject with ID 14 deleted successfully
+[2024-10-06 20:32:02] Subject with ID 14 deleted successfully
