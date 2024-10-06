@@ -1,0 +1,39 @@
+[2024-10-06 13:47:30] Form Data: sub_nameEN=AAA, sub_nameTH=ฟฟ, sub_semester=1, sub_section=1, sub_department=1, sub_detail=1, exam_date=2024-10-06, exam_room=Room 111, exam_start=18:47, exam_end=18:47, teacher_id=2
+[2024-10-06 13:47:30] Subject inserted successfully with ID 16
+[2024-10-06 13:47:30] Exam inserted successfully for subject ID 16
+[2024-10-06 13:51:14] Form Data: sub_nameEN=test7777, sub_nameTH=test7777, sub_semester=1, sub_section=1, sub_department=1, sub_detail=1, exam_date=2024-10-06, exam_room=Room 777, exam_start=18:51, exam_end=18:51, teacher_id=2
+[2024-10-06 13:51:14] Subject inserted successfully with ID 17
+[2024-10-06 13:51:14] Exam inserted successfully for subject ID 17
+[2024-10-06 13:57:49] No exam ID provided for deletion
+[2024-10-06 13:57:56] No exam ID provided for deletion
+[2024-10-06 13:59:04] No exam ID provided for deletion
+[2024-10-06 14:00:42] No subject ID provided for deletion
+[2024-10-06 14:02:43] No subject ID provided for deletion
+[2024-10-06 14:02:48] Request to delete subject with ID: 17
+[2024-10-06 14:04:54] Request to delete subject with ID: 17
+[2024-10-06 14:04:54] Related exams for subject with ID 17 deleted successfully
+[2024-10-06 14:04:54] Subject with ID 17 deleted successfully
+[2024-10-06 14:04:57] Request to delete subject with ID: 16
+[2024-10-06 14:04:57] Related exams for subject with ID 16 deleted successfully
+[2024-10-06 14:04:57] Subject with ID 16 deleted successfully
+[2024-10-06 14:05:23] Request to delete subject with ID: 15
+[2024-10-06 14:05:23] Related exams for subject with ID 15 deleted successfully
+[2024-10-06 14:05:23] Subject with ID 15 deleted successfully
+[2024-10-06 14:13:34] Form Data: sub_nameEN=qqq, sub_nameTH=qqq, sub_semester=1, sub_section=1, sub_department=1, sub_detail=1, exam_date=2024-10-01, exam_room=1, exam_start=19:13, exam_end=19:13, teacher_id=2
+[2024-10-06 14:13:34] Subject inserted successfully with ID 18
+[2024-10-06 14:13:34] Exam inserted successfully for subject ID 18
+[2024-10-06 15:26:26] No subject ID provided for deletion
+[2024-10-06 15:27:09] Form Data: sub_nameEN=asdasds, sub_nameTH=asdasdas, sub_semester=1, sub_section=1, sub_department=1, sub_detail=1, exam_date=2024-10-28, exam_room=1, exam_start=20:28, exam_end=20:30, teacher_id=5
+[2024-10-06 15:27:09] Subject inserted successfully with ID 19
+[2024-10-06 15:27:09] Exam inserted successfully for subject ID 19
+[2024-10-06 15:28:58] No subject ID provided for deletion
+[2024-10-06 15:29:32] No subject ID provided for deletion
+[2024-10-06 15:29:53] Request to delete subject with ID: 19
+[2024-10-06 15:29:53] Related exams for subject with ID 19 deleted successfully
+[2024-10-06 15:29:53] Subject with ID 19 deleted successfully
+[2024-10-06 15:35:41] Form Data: sub_nameEN=test99, sub_nameTH=test99, sub_semester=1, sub_section=1, sub_department=1, sub_detail=1, exam_date=2024-10-08, exam_room=1, exam_start=22:35, exam_end=12:35, teacher_id=5
+[2024-10-06 15:35:41] Subject inserted successfully with ID 20
+[2024-10-06 15:35:41] Exam inserted successfully for subject ID 20
+[2024-10-06 15:51:02] Request to delete subject with ID: 20
+[2024-10-06 15:51:02] Related exams for subject with ID 20 deleted successfully
+[2024-10-06 15:51:02] Subject with ID 20 deleted successfully
