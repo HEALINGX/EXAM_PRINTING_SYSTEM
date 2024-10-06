@@ -2,9 +2,8 @@
 session_start();
 
 // ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือยัง ถ้ายังให้ redirect ไปหน้า login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
+if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower($_SESSION["user_role"]) !== 'admin') {
+    die("Access denied: Unauthorized user.");
 }
 
 // Database connection

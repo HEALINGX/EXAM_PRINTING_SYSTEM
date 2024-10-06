@@ -2,9 +2,8 @@
 session_start();
 
 // Check if the user is logged in; if not, redirect to the login page
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
+if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower($_SESSION["user_role"]) !== 'examtech') {
+    die("Access denied: Unauthorized user.");
 }
 
 // Database connection
@@ -26,7 +25,7 @@ $resultUsers = $conn->query($sql);
 
 // Fetch existing exams
 $sql = "SELECT  s.sub_id, e.exam_id, s.sub_nameEN,s.sub_nameTH,s.sub_semester,s.sub_department,s.sub_section,s.sub_detail,
-                e.exam_date, e.exam_room, e.exam_status,
+                e.exam_date, e.exam_room, e.exam_status,e.exam_year,
                 e.exam_start, e.exam_end, u.user_firstname, u.user_lastname
         FROM subject s 
         JOIN exam e ON s.sub_id = e.sub_id 
@@ -66,10 +65,27 @@ $resultExams = $conn->query($sql);
 
 <!-- Main Content -->
 <main class="container mt-5 pt-10">
-    <h2>Exam File Management</h2>
+    <h2>Subject Management</h2>
     <div class="search-bar mb-3">
         <input type="text" class="form-control" id="searchInput" placeholder="Search Subject..." onkeyup="searchUsers()">
         <button class="btn btn-primary" data-toggle="modal" data-target="#addExamModal">Add Subject</button>
+    </div>
+
+    <div class="semester-selection mb-3">
+        <label for="semesterSelect">Select Semester:</label>
+        <select id="semesterSelect" class="form-control" onchange="filterBySemesterAndYear()">
+            <option value="">All</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+        </select>
+    </div>
+    <div class="year-selection mb-3">
+        <label for="yearSelect">Select Year:</label>
+        <select id="yearSelect" class="form-control" onchange="filterBySemesterAndYear()">
+            <option value="">All</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
     </div>
 
     <!-- Add Exam Modal -->
@@ -215,11 +231,13 @@ $resultExams = $conn->query($sql);
 </div>
 
 
-    <table class="table table-bordered mt-4">
-        <thead class="thead-light">
+    <table class="table" id="userTable">
+        <thead class="thead-dark">
             <tr>
                 <th>Subject Name</th>
                 <th>Exam Date</th>
+                <th>Semester</th>
+                <th>Exam Year</th>
                 <th>Room</th>
                 <th>Time</th>
                 <th>Teacher Name</th>
@@ -233,6 +251,8 @@ $resultExams = $conn->query($sql);
                     echo "<tr>
                             <td>" . htmlspecialchars($row['sub_nameEN']) . "</td>
                             <td>" . htmlspecialchars($row['exam_date']) . "</td>
+                            <td>" . htmlspecialchars($row['sub_semester']) . "</td>
+                            <td>" . htmlspecialchars($row['exam_year']) . "</td>
                             <td>" . htmlspecialchars($row['exam_room']) . "</td>
                             <td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>
                             <td>" . htmlspecialchars($row['user_firstname']) . "  " . htmlspecialchars($row['user_lastname']) . "</td>
@@ -299,6 +319,32 @@ function editExam(examData) {
             }
         }
     }
+
+    function filterBySemesterAndYear() {
+        let semesterSelect = document.getElementById("semesterSelect");
+        let yearSelect = document.getElementById("yearSelect");
+        let semester = semesterSelect.value;
+        let year = yearSelect.value;
+        let table = document.getElementById("examTableBody");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < tr.length; i++) {
+            let tdSemester = tr[i].getElementsByTagName("td")[2];
+            let tdYear = tr[i].getElementsByTagName("td")[3];
+            let display = true;
+
+            if (semester && tdSemester.innerHTML !== semester) {
+                display = false;
+            }
+
+            if (year && tdYear.innerHTML !== year) {
+                display = false;
+            }
+
+            tr[i].style.display = display ? "" : "none";
+        }
+    }
+
 </script>
 </body>
 </html>

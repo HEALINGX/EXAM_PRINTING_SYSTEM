@@ -2,9 +2,8 @@
 session_start();
 
 // ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือยัง ถ้ายังให้ redirect ไปหน้า login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
+if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower($_SESSION["user_role"]) !== 'technology') {
+    die("Access denied: Unauthorized user.");
 }
 
 // Database connection
@@ -21,7 +20,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "
-SELECT s.sub_id, s.sub_nameEN, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status 
+SELECT s.sub_id, s.sub_nameEN,s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status,e.exam_year 
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
 ";
@@ -68,28 +67,50 @@ if ($result === false) {
         <input type="text" class="form-control" id="searchInput" placeholder="Search Subject..." onkeyup="searchUsers()">
     </div>
 
+    <div class="semester-selection mb-3">
+        <label for="semesterSelect">Select Semester:</label>
+        <select id="semesterSelect" class="form-control" onchange="filterBySemesterAndYear()">
+            <option value="">All</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+        </select>
+    </div>
+    <div class="year-selection mb-3">
+        <label for="yearSelect">Select Year:</label>
+        <select id="yearSelect" class="form-control" onchange="filterBySemesterAndYear()">
+            <option value="">All</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+
+
     <table class="table" id="userTable">
         <thead class="thead-dark">
             <tr>
                 <th>ID</th>
                 <th>NAME</th>
+                <th>EXAM_SEMESTER</th>
                 <th>EXAM_DATE</th>
+                <th>EXAM_YEAR</th>
                 <th>EXAM_START</th>
                 <th>EXAM_END</th>
                 <th>EXAM_ROOM</th>
                 <th>Exam File</th>
                 <th>Download</th>
-                <th>Status</th>   
+                <th>STATUS</th>   
             </tr>
         </thead>
-        <tbody>
+        <tbody id="examTableBody">
             <?php
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
                     echo "<tr id='row_" . htmlspecialchars($row['sub_id']) . "'>";
                     echo "<td>" . htmlspecialchars($row['sub_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['sub_nameEN']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
@@ -112,7 +133,14 @@ if ($result === false) {
                     }
 
                     // แสดงสถานะจากฐานข้อมูล
-                    echo "<td>" . htmlspecialchars($row['exam_status']) . "</td>"; 
+                    echo "<td>
+                        <select onchange='updateStatus(\"" . htmlspecialchars($row["sub_id"]) . "\", this.value)'>
+                            <option value=''>Select Status</option>
+                            <option value='Not Uploaded'" . ($row['exam_status'] === 'Not Uploaded' ? ' selected' : '') . ">Not Uploaded</option>
+                            <option value='Uploaded'" . ($row['exam_status'] === 'Uploaded' ? ' selected' : '') . ">Uploaded</option>
+                            <option value='Printed'" . ($row['exam_status'] === 'Printed' ? ' selected' : '') . ">Printed</option>
+                        </select>
+                    </td>";
                     echo "</tr>";
                 }
             } else {
@@ -130,22 +158,49 @@ if ($result === false) {
 <script src="search.js"></script>
 
 <script>
-function updateStatus(subId) {
+function updateStatus(subId, status) {
+    if (!status) return; // ถ้าไม่เลือกสถานะให้หยุดการทำงาน
+
     $.ajax({
         type: "POST",
         url: "update_status.php",
-        data: { sub_id: subId },
+        data: { sub_id: subId, exam_status: status },
         success: function(response) {
             console.log(response); // แสดงข้อความตอบกลับใน console
             // อัปเดตสถานะในตาราง
             var row = $('#row_' + subId);
-            row.find('td:last').text('Printed'); // เปลี่ยนสถานะในคอลัมน์ Status
+            row.find('td:last').text(status); // เปลี่ยนสถานะในคอลัมน์ Status
         },
         error: function(xhr, status, error) {
             console.error(xhr.responseText);
         }
     });
 }
+
+function filterBySemesterAndYear() {
+        let semesterSelect = document.getElementById("semesterSelect");
+        let yearSelect = document.getElementById("yearSelect");
+        let semester = semesterSelect.value;
+        let year = yearSelect.value;
+        let table = document.getElementById("examTableBody");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < tr.length; i++) {
+            let tdSemester = tr[i].getElementsByTagName("td")[2];
+            let tdYear = tr[i].getElementsByTagName("td")[4];
+            let display = true;
+
+            if (semester && tdSemester.innerHTML !== semester) {
+                display = false;
+            }
+
+            if (year && tdYear.innerHTML !== year) {
+                display = false;
+            }
+
+            tr[i].style.display = display ? "" : "none";
+        }
+    }
 </script>
 
 </body>

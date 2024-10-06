@@ -81,8 +81,10 @@ SELECT
     s.teach_id, 
     s.sub_nameEN, 
     s.sub_nameTH, 
+    s.sub_semester,
     s.sub_id, 
-    e.exam_date, 
+    e.exam_date,
+    e.exam_year, 
     e.exam_start, 
     e.exam_end, 
     e.exam_status, 
@@ -151,13 +153,31 @@ $conn->close();
     <div class="search-bar mb-3">
         <input type="text" class="form-control" id="searchInput" placeholder="Search subject..." onkeyup="searchSubject()">
     </div>
-    <table class="table table-bordered table-hover" id="userTable">
-        <thead class="thead-light">
+    <div class="semester-selection mb-3">
+        <label for="semesterSelect">Select Semester:</label>
+        <select id="semesterSelect" class="form-control" onchange="filterBySemesterAndYear()">
+            <option value="">All</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+        </select>
+    </div>
+    <div class="year-selection mb-3">
+        <label for="yearSelect">Select Year:</label>
+        <select id="yearSelect" class="form-control" onchange="filterBySemesterAndYear()">
+            <option value="">All</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+    <table class="table" id="userTable">
+        <thead class="thead-dark">
             <tr>
                 <th>Subject ID</th>
                 <th>Subject Name(TH)</th>
                 <th>Subject Name(ENG)</th>
-                <th>Exam Date</th>
+                <th>Subject Semester</th>
+                <th style="width: 50%;">Exam Date</th>
+                <th>Exam Year</th>
                 <th>Exam Time</th>
                 <th>Exam Status</th>
                 <th>Exam Room</th>
@@ -170,9 +190,18 @@ $conn->close();
                 <td><?php echo htmlspecialchars($row['sub_id']); ?></td>
                 <td><?php echo htmlspecialchars($row['sub_nameTH']); ?></td>
                 <td><?php echo htmlspecialchars($row['sub_nameEN']); ?></td>
+                <td><?php echo htmlspecialchars($row['sub_semester']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
+                <td><?php echo htmlspecialchars($row['exam_year']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_start']) . ' - ' . htmlspecialchars($row['exam_end']); ?></td>
-                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
+                <td>
+                    <select onchange='updateStatus("<?php echo htmlspecialchars($row["sub_id"]); ?>", this.value)'>
+                        <option value=''>Select Status</option>
+                        <option value='Not Uploaded' <?php if ($row['exam_status'] === 'Not Uploaded') echo 'selected'; ?>>Not Uploaded</option>
+                        <option value='Uploaded' <?php if ($row['exam_status'] === 'Uploaded') echo 'selected'; ?>>Uploaded</option>
+                        <option value='Printed' <?php if ($row['exam_status'] === 'Printed') echo 'selected'; ?>>Printed</option>
+                    </select>
+                </td>
                 <td><?php echo htmlspecialchars($row['exam_room']); ?></td>
                 <td>
                     <form action="" method="post" enctype="multipart/form-data">
@@ -191,5 +220,53 @@ $conn->close();
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="searchSubject.js"></script>
+<script>
+    function filterBySemesterAndYear() {
+        let semesterSelect = document.getElementById("semesterSelect");
+        let yearSelect = document.getElementById("yearSelect");
+        let semester = semesterSelect.value;
+        let year = yearSelect.value;
+        let table = document.getElementById("userTable");
+        let tr = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < tr.length; i++) {
+            let tdSemester = tr[i].getElementsByTagName("td")[3];
+            let tdYear = tr[i].getElementsByTagName("td")[5];
+            let display = true;
+
+            if (semester && tdSemester.innerHTML !== semester) {
+                display = false;
+            }
+
+            if (year && tdYear.innerHTML !== year) {
+                display = false;
+            }
+
+            tr[i].style.display = display ? "" : "none";
+        }
+    }
+
+    function updateStatus(subId, status) {
+    if (!status) {
+        alert("Please select a status.");
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "update_status.php",
+        data: { sub_id: subId, status: status },
+        success: function(response) {
+            console.log(response);
+            // แสดงผลสถานะที่อัปเดตใน UI
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+
+</script>
+
 </body>
 </html>
