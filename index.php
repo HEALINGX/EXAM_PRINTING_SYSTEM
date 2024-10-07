@@ -26,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_result($user_id, $hashed_password, $user_role);
     $stmt->fetch();
 
- 
     if ($stmt->num_rows > 0 && md5($password) == $hashed_password) {
        
         $_SESSION["user_id"] = $user_id;

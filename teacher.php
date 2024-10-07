@@ -202,12 +202,16 @@ $conn->close();
                         <option value='Printed' <?php if ($row['exam_status'] === 'Printed') echo 'selected'; ?>>Printed</option>
                     </select>
                 </td>
+
                 <td><?php echo htmlspecialchars($row['exam_room']); ?></td>
                 <td>
                     <form action="" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="sub_id" value="<?php echo htmlspecialchars($row['sub_id']); ?>">
-                        <input type="file" name="pdf_file" required>
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <input type="file" name="pdf_file" required <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>>
+                        <button type="submit" class="btn btn-primary <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>" 
+                            style="<?php if ($row['exam_status'] === 'Printed') echo 'background-color: grey; border-color: grey; cursor: not-allowed;'; ?>">
+                            Upload
+                        </button>
                     </form>
                 </td>
             </tr>
@@ -217,56 +221,74 @@ $conn->close();
 </main>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="searchSubject.js"></script>
 <script>
-    function filterBySemesterAndYear() {
-        let semesterSelect = document.getElementById("semesterSelect");
-        let yearSelect = document.getElementById("yearSelect");
-        let semester = semesterSelect.value;
-        let year = yearSelect.value;
-        let table = document.getElementById("userTable");
-        let tr = table.getElementsByTagName("tr");
-
-        for (let i = 1; i < tr.length; i++) {
-            let tdSemester = tr[i].getElementsByTagName("td")[3];
-            let tdYear = tr[i].getElementsByTagName("td")[5];
-            let display = true;
-
-            if (semester && tdSemester.innerHTML !== semester) {
-                display = false;
+function updateStatus(subId, status) {
+    if (status) {
+        fetch('update_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sub_id: subId, exam_status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                alert('Error updating status');
             }
-
-            if (year && tdYear.innerHTML !== year) {
-                display = false;
-            }
-
-            tr[i].style.display = display ? "" : "none";
-        }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }
-
-    function updateStatus(subId, status) {
-    if (!status) {
-        alert("Please select a status.");
-        return;
-    }
-
-    $.ajax({
-        type: "POST",
-        url: "update_status.php",
-        data: { sub_id: subId, status: status },
-        success: function(response) {
-            console.log(response);
-            // แสดงผลสถานะที่อัปเดตใน UI
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-        }
-    });
 }
 
-</script>
+function searchSubject() {
+    var input, filter, table, tr, td, i, j, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("userTable");
+    tr = table.getElementsByTagName("tr");
 
+    for (i = 1; i < tr.length; i++) {
+        tr[i].style.display = "none"; // Initially hide all rows
+        td = tr[i].getElementsByTagName("td");
+        for (j = 0; j < td.length; j++) {
+            if (td[j]) {
+                txtValue = td[j].textContent || td[j].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = ""; // Show the row if it matches
+                    break;
+                }
+            }
+        }
+    }
+}
+
+function filterBySemesterAndYear() {
+    var semesterSelect = document.getElementById("semesterSelect").value;
+    var yearSelect = document.getElementById("yearSelect").value;
+    var table, tr, td, i;
+
+    table = document.getElementById("userTable");
+    tr = table.getElementsByTagName("tr");
+
+    for (i = 1; i < tr.length; i++) {
+        tr[i].style.display = "none"; // Initially hide all rows
+        td = tr[i].getElementsByTagName("td");
+
+        var semesterMatch = semesterSelect === "" || td[3].innerText === semesterSelect;
+        var yearMatch = yearSelect === "" || td[5].innerText === yearSelect;
+
+        if (semesterMatch && yearMatch) {
+            tr[i].style.display = ""; // Show the row if it matches both criteria
+        }
+    }
+}
+</script>
 </body>
 </html>

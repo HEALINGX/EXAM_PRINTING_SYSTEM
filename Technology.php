@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "
-SELECT s.sub_id, s.sub_nameEN,s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status,e.exam_year 
+SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year 
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
 ";
@@ -84,7 +84,6 @@ if ($result === false) {
         </select>
     </div>
 
-
     <table class="table" id="userTable">
         <thead class="thead-dark">
             <tr>
@@ -122,12 +121,10 @@ if ($result === false) {
                     }
                     echo "</td>";
 
-                    // ใช้ pdf_path ที่บันทึกในฐานข้อมูล
                     $file_path = htmlspecialchars($row['pdf_path']);
-                    // กำหนดเส้นทางที่อยู่ของไฟล์
                     $full_path = __DIR__ . "/uploads/" . $file_path; 
-                    if ($file_path && file_exists($full_path)) { // ตรวจสอบว่าไฟล์มีอยู่จริง
-                        echo "<td><a href='uploads/" . $file_path . "' class='btn btn-primary' download onclick='updateStatus(\"" . $row["sub_id"] . "\")'>Download</a></td>";
+                    if ($file_path && file_exists($full_path)) { 
+                        echo "<td><a href='uploads/" . $file_path . "' class='btn btn-primary' download>Download</a></td>";
                     } else {
                         echo "<td>No file uploaded</td>";
                     }
@@ -136,9 +133,9 @@ if ($result === false) {
                     echo "<td>
                         <select onchange='updateStatus(\"" . htmlspecialchars($row["sub_id"]) . "\", this.value)'>
                             <option value=''>Select Status</option>
-                            <option value='Not Uploaded'" . ($row['exam_status'] === 'Not Uploaded' ? ' selected' : '') . ">Not Uploaded</option>
-                            <option value='Uploaded'" . ($row['exam_status'] === 'Uploaded' ? ' selected' : '') . ">Uploaded</option>
-                            <option value='Printed'" . ($row['exam_status'] === 'Printed' ? ' selected' : '') . ">Printed</option>
+                            <option value='Not Uploaded' " . ($row['exam_status'] === 'Not Uploaded' ? 'selected' : '') . ">Not Uploaded</option>
+                            <option value='Uploaded' " . ($row['exam_status'] === 'Uploaded' ? 'selected' : '') . ">Uploaded</option>
+                            <option value='Printed' " . ($row['exam_status'] === 'Printed' ? 'selected' : '') . ">Printed</option>
                         </select>
                     </td>";
                     echo "</tr>";
@@ -149,27 +146,27 @@ if ($result === false) {
             ?>
         </tbody>
     </table>
-
 </main>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="search.js"></script>
 
 <script>
 function updateStatus(subId, status) {
-    if (!status) return; // ถ้าไม่เลือกสถานะให้หยุดการทำงาน
+    if (!status) {
+        alert("Please select a status.");
+        return;
+    }
 
     $.ajax({
         type: "POST",
         url: "update_status.php",
-        data: { sub_id: subId, exam_status: status },
+        data: { sub_id: subId, status: status },
         success: function(response) {
-            console.log(response); // แสดงข้อความตอบกลับใน console
-            // อัปเดตสถานะในตาราง
-            var row = $('#row_' + subId);
-            row.find('td:last').text(status); // เปลี่ยนสถานะในคอลัมน์ Status
+            alert(response); // แสดงข้อความยืนยันเมื่ออัปเดตสำเร็จ
+            console.log(response);
         },
         error: function(xhr, status, error) {
             console.error(xhr.responseText);
@@ -178,29 +175,29 @@ function updateStatus(subId, status) {
 }
 
 function filterBySemesterAndYear() {
-        let semesterSelect = document.getElementById("semesterSelect");
-        let yearSelect = document.getElementById("yearSelect");
-        let semester = semesterSelect.value;
-        let year = yearSelect.value;
-        let table = document.getElementById("examTableBody");
-        let tr = table.getElementsByTagName("tr");
+    let semesterSelect = document.getElementById("semesterSelect");
+    let yearSelect = document.getElementById("yearSelect");
+    let semester = semesterSelect.value;
+    let year = yearSelect.value;
+    let table = document.getElementById("examTableBody");
+    let tr = table.getElementsByTagName("tr");
 
-        for (let i = 0; i < tr.length; i++) {
-            let tdSemester = tr[i].getElementsByTagName("td")[2];
-            let tdYear = tr[i].getElementsByTagName("td")[4];
-            let display = true;
+    for (let i = 0; i < tr.length; i++) {
+        let tdSemester = tr[i].getElementsByTagName("td")[2];
+        let tdYear = tr[i].getElementsByTagName("td")[4];
+        let display = true;
 
-            if (semester && tdSemester.innerHTML !== semester) {
-                display = false;
-            }
-
-            if (year && tdYear.innerHTML !== year) {
-                display = false;
-            }
-
-            tr[i].style.display = display ? "" : "none";
+        if (semester && tdSemester.innerHTML !== semester) {
+            display = false;
         }
+
+        if (year && tdYear.innerHTML !== year) {
+            display = false;
+        }
+
+        tr[i].style.display = display ? "" : "none";
     }
+}
 </script>
 
 </body>
