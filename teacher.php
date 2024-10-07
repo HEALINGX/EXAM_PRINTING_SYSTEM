@@ -84,6 +84,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     }
 }
 
+// Handle comment submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['comment']) && isset($_POST['sub_id'])) {
+    $sub_id = $_POST['sub_id'];
+    $comment = $_POST['comment'];
+
+    // Update the database with the comment
+    $sql = "UPDATE exam SET exam_comment = ? WHERE sub_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $comment, $sub_id);
+
+    if ($stmt->execute()) {
+        echo "Comment has been updated.";
+    } else {
+        echo "Sorry, there was an error updating your comment: " . $conn->error;
+    }
+
+    $stmt->close();
+}
+
 // Fetch user information from the database using user_id from session
 $user_id = $_SESSION["user_id"];
 $sql = "
@@ -99,7 +118,8 @@ SELECT
     e.exam_room,
     s.sub_semester,
     e.exam_year,
-    e.pdf_path
+    e.pdf_path,
+    e.exam_comment
 FROM 
     exam e
 JOIN 
@@ -127,7 +147,6 @@ $rows = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -193,6 +212,7 @@ $conn->close();
                 <th>Exam Semester</th>
                 <th>Exam Year</th>
                 <th>Upload File</th>
+                <th>Comment</th>
             </tr>
         </thead>
         <tbody>
@@ -209,77 +229,78 @@ $conn->close();
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
-                    echo "<td>
-                            <form action='' method='post' enctype='multipart/form-data'>
-                                <input type='file' name='pdf_file' accept='application/pdf' required>
+                    echo "<td>";
+                    if ($row['pdf_path']) {
+                        echo "<form method='post' class='delete-form'>
                                 <input type='hidden' name='sub_id' value='" . htmlspecialchars($row['sub_id']) . "'>
-                                <button type='submit' class='btn btn-primary btn-sm'>Upload</button>
-                            </form>
-                          </td>";
+                                <input type='hidden' name='action' value='delete'>
+                                <button type='submit' class='btn btn-danger'>Delete</button>
+                              </form>";
+                    } else {
+                        echo "<form method='post' enctype='multipart/form-data'>
+                                <input type='hidden' name='sub_id' value='" . htmlspecialchars($row['sub_id']) . "'>
+                                <input type='file' name='pdf_file' accept='.pdf'>
+                                <button type='submit' class='btn btn-primary'>Upload</button>
+                              </form>";
+                    }
+                    echo "</td>";
+                    echo "<td>";
+                    echo "<form method='post' class='comment-form'>
+                            <input type='hidden' name='sub_id' value='" . htmlspecialchars($row['sub_id']) . "'>
+                            <textarea name='comment' rows='2' class='form-control'>" . htmlspecialchars($row['exam_comment']) . "</textarea>
+                            <button type='submit' class='btn btn-primary mt-2'>Save Comment</button>
+                          </form>";
+                    echo "</td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='10'>No subjects found.</td></tr>";
+                echo "<tr><td colspan='11'>No subjects found for this user.</td></tr>";
             }
             ?>
         </tbody>
     </table>
 </main>
 
-<!-- Scripts -->
 <script>
-    function searchSubject() {
-        let input = document.getElementById("searchInput");
-        let filter = input.value.toLowerCase();
-        let table = document.getElementById("userTable");
-        let tr = table.getElementsByTagName("tr");
-
-        for (let i = 1; i < tr.length; i++) {
-            let td = tr[i].getElementsByTagName("td");
-            let found = false;
-
-            for (let j = 0; j < td.length; j++) {
-                if (td[j]) {
-                    if (td[j].innerHTML.toLowerCase().indexOf(filter) > -1) {
-                        found = true;
-                        break;
-                    }
+function searchSubject() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toLowerCase();
+    table = document.getElementById("userTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 1; i < tr.length; i++) {
+        tr[i].style.display = "none";
+        td = tr[i].getElementsByTagName("td");
+        for (var j = 0; j < td.length; j++) {
+            if (td[j]) {
+                txtValue = td[j].textContent || td[j].innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    break;
                 }
             }
-
-            tr[i].style.display = found ? "" : "none";
         }
     }
+}
 
-    function filterBySemesterAndYear() {
-        let semesterSelect = document.getElementById("semesterSelect");
-        let yearSelect = document.getElementById("yearSelect");
-        let semester = semesterSelect.value;
-        let year = yearSelect.value;
-        let table = document.getElementById("userTable");
-        let tr = table.getElementsByTagName("tr");
+function filterBySemesterAndYear() {
+    var semesterSelect = document.getElementById("semesterSelect").value;
+    var yearSelect = document.getElementById("yearSelect").value;
+    var table = document.getElementById("userTable");
+    var tr = table.getElementsByTagName("tr");
 
-        for (let i = 1; i < tr.length; i++) {
-            let tdSemester = tr[i].getElementsByTagName("td")[7];
-            let tdYear = tr[i].getElementsByTagName("td")[8];
-            let display = true;
+    for (var i = 1; i < tr.length; i++) {
+        tr[i].style.display = "none";
+        var semesterTd = tr[i].getElementsByTagName("td")[7];
+        var yearTd = tr[i].getElementsByTagName("td")[8];
+        var showSemester = !semesterSelect || semesterTd.textContent === semesterSelect;
+        var showYear = !yearSelect || yearTd.textContent === yearSelect;
 
-            if (semester && tdSemester.innerHTML !== semester) {
-                display = false;
-            }
-
-            if (year && tdYear.innerHTML !== year) {
-                display = false;
-            }
-
-            tr[i].style.display = display ? "" : "none";
+        if (showSemester && showYear) {
+            tr[i].style.display = "";
         }
     }
+}
 </script>
-
-<!-- Bootstrap JS (optional) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
