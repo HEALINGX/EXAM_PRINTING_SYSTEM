@@ -1,21 +1,28 @@
 function searchSubject() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toLowerCase();
-    const table = document.getElementById('userTable');
-    const tr = table.getElementsByTagName('tr');
+    // Get the search input value
+    var input = document.getElementById("searchInput").value.toLowerCase();
 
-    for (let i = 1; i < tr.length; i++) {
-        const tdSubNameTH = tr[i].getElementsByTagName('td')[1];
-        const tdSubNameEN = tr[i].getElementsByTagName('td')[2];
-        let match = false;
+    // Get the table and all the rows
+    var table = document.getElementById("userTable");
+    var rows = table.getElementsByTagName("tr");
 
-        if (tdSubNameTH && tdSubNameEN) {
-            const txtValueTH = tdSubNameTH.textContent || tdSubNameTH.innerText;
-            const txtValueEN = tdSubNameEN.textContent || tdSubNameEN.innerText;
-            if (txtValueTH.toLowerCase().indexOf(filter) > -1 || txtValueEN.toLowerCase().indexOf(filter) > -1) {
-                match = true;
+    // Loop through all rows except the first one (header)
+    for (var i = 1; i < rows.length; i++) {
+        var subjectId = rows[i].getElementsByTagName("td")[0];
+        var subjectNameTH = rows[i].getElementsByTagName("td")[1];
+        var subjectNameEN = rows[i].getElementsByTagName("td")[2];
+
+        if (subjectId || subjectNameTH || subjectNameEN) {
+            var idText = subjectId.textContent.toLowerCase();
+            var nameTHText = subjectNameTH.textContent.toLowerCase();
+            var nameENText = subjectNameEN.textContent.toLowerCase();
+
+            // Check if the input matches the subject ID or name (TH/EN)
+            if (idText.includes(input) || nameTHText.includes(input) || nameENText.includes(input)) {
+                rows[i].style.display = ""; // Show the row
+            } else {
+                rows[i].style.display = "none"; // Hide the row
             }
         }
-        tr[i].style.display = match ? "" : "none";
     }
 }

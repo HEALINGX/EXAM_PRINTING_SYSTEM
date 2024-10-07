@@ -2,8 +2,9 @@
 session_start();
 
 // ตรวจสอบว่าผู้ใช้ล็อกอินแล้วหรือยัง ถ้ายังให้ redirect ไปหน้า login
-if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower($_SESSION["user_role"]) !== 'technology') {
-    die("Access denied: Unauthorized user.");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
 }
 
 // Database connection
@@ -20,7 +21,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "
-SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year 
+SELECT s.sub_semester,e.exam_year,s.sub_id, s.sub_nameEN, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status 
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
 ";
@@ -38,7 +39,7 @@ if ($result === false) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Tech.</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="adminstyles.css"> 
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
 
@@ -66,7 +67,6 @@ if ($result === false) {
     <div class="search-bar mb-3">
         <input type="text" class="form-control" id="searchInput" placeholder="Search Subject..." onkeyup="searchUsers()">
     </div>
-
     <div class="semester-selection mb-3">
         <label for="semesterSelect">Select Semester:</label>
         <select id="semesterSelect" class="form-control" onchange="filterBySemesterAndYear()">
@@ -83,36 +83,36 @@ if ($result === false) {
             <option value="2025">2025</option>
         </select>
     </div>
-
     <table class="table" id="userTable">
         <thead class="thead-dark">
             <tr>
                 <th>ID</th>
                 <th>NAME</th>
-                <th>EXAM_SEMESTER</th>
                 <th>EXAM_DATE</th>
-                <th>EXAM_YEAR</th>
                 <th>EXAM_START</th>
                 <th>EXAM_END</th>
                 <th>EXAM_ROOM</th>
+                <th>Exam SEMESTER</th>
+                <th>Exam YEAR</th>
                 <th>Exam File</th>
                 <th>Download</th>
-                <th>STATUS</th>   
+                <th>Status</th>   
             </tr>
         </thead>
-        <tbody id="examTableBody">
+        <tbody>
             <?php
             if ($result->num_rows > 0) {
                 while($row = $result->fetch_assoc()) {
                     echo "<tr id='row_" . htmlspecialchars($row['sub_id']) . "'>";
                     echo "<td>" . htmlspecialchars($row['sub_id']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['sub_nameEN']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
+    
                     echo "<td>";
                     if ($row['pdf_path']) {
                         echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary' style='background-color: #6f42c1; border-color: #6f42c1;'>View File</a>";
@@ -121,23 +121,18 @@ if ($result === false) {
                     }
                     echo "</td>";
 
+                    // ใช้ pdf_path ที่บันทึกในฐานข้อมูล
                     $file_path = htmlspecialchars($row['pdf_path']);
+                    // กำหนดเส้นทางที่อยู่ของไฟล์
                     $full_path = __DIR__ . "/uploads/" . $file_path; 
-                    if ($file_path && file_exists($full_path)) { 
-                        echo "<td><a href='uploads/" . $file_path . "' class='btn btn-primary' download>Download</a></td>";
+                    if ($file_path && file_exists($full_path)) { // ตรวจสอบว่าไฟล์มีอยู่จริง
+                        echo "<td><a href='uploads/" . $file_path . "' class='btn btn-primary' download onclick='updateStatus(\"" . $row["sub_id"] . "\")'>Download</a></td>";
                     } else {
                         echo "<td>No file uploaded</td>";
                     }
 
                     // แสดงสถานะจากฐานข้อมูล
-                    echo "<td>
-                        <select onchange='updateStatus(\"" . htmlspecialchars($row["sub_id"]) . "\", this.value)'>
-                            <option value=''>Select Status</option>
-                            <option value='Not Uploaded' " . ($row['exam_status'] === 'Not Uploaded' ? 'selected' : '') . ">Not Uploaded</option>
-                            <option value='Uploaded' " . ($row['exam_status'] === 'Uploaded' ? 'selected' : '') . ">Uploaded</option>
-                            <option value='Printed' " . ($row['exam_status'] === 'Printed' ? 'selected' : '') . ">Printed</option>
-                        </select>
-                    </td>";
+                    echo "<td>" . htmlspecialchars($row['exam_status']) . "</td>"; 
                     echo "</tr>";
                 }
             } else {
@@ -146,57 +141,58 @@ if ($result === false) {
             ?>
         </tbody>
     </table>
+
 </main>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script>
+function filterBySemesterAndYear() {
+    const semesterSelect = document.getElementById("semesterSelect");
+    const selectedSemester = semesterSelect.value;
+    
+    const yearSelect = document.getElementById("yearSelect");
+    const selectedYear = yearSelect.value;
+    
+    const rows = document.querySelectorAll("#userTable tbody tr");
+
+    rows.forEach(row => {
+        const semesterCell = row.cells[6]; // คอลัมน์ 'Exam SEMESTER' (index 6)
+        const yearCell = row.cells[7]; // คอลัมน์ 'Exam YEAR' (index 7)
+
+        const semester = semesterCell ? semesterCell.textContent.trim() : '';
+        const year = yearCell ? yearCell.textContent.trim() : '';
+
+        if ((selectedSemester === "" || semester === selectedSemester) && 
+            (selectedYear === "" || year === selectedYear)) {
+            row.style.display = ""; // แสดงแถว
+        } else {
+            row.style.display = "none"; // ซ่อนแถว
+        }
+    });
+}
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="search.js"></script>
 
 <script>
-function updateStatus(subId, status) {
-    if (!status) {
-        alert("Please select a status.");
-        return;
-    }
-
+function updateStatus(subId) {
     $.ajax({
         type: "POST",
         url: "update_status.php",
-        data: { sub_id: subId, status: status },
+        data: { sub_id: subId },
         success: function(response) {
-            alert(response); // แสดงข้อความยืนยันเมื่ออัปเดตสำเร็จ
-            console.log(response);
+            console.log(response); // แสดงข้อความตอบกลับใน console
+            // อัปเดตสถานะในตาราง
+            var row = $('#row_' + subId);
+            row.find('td:last').text('Printed'); // เปลี่ยนสถานะในคอลัมน์ Status
         },
         error: function(xhr, status, error) {
             console.error(xhr.responseText);
         }
     });
-}
-
-function filterBySemesterAndYear() {
-    let semesterSelect = document.getElementById("semesterSelect");
-    let yearSelect = document.getElementById("yearSelect");
-    let semester = semesterSelect.value;
-    let year = yearSelect.value;
-    let table = document.getElementById("examTableBody");
-    let tr = table.getElementsByTagName("tr");
-
-    for (let i = 0; i < tr.length; i++) {
-        let tdSemester = tr[i].getElementsByTagName("td")[2];
-        let tdYear = tr[i].getElementsByTagName("td")[4];
-        let display = true;
-
-        if (semester && tdSemester.innerHTML !== semester) {
-            display = false;
-        }
-
-        if (year && tdYear.innerHTML !== year) {
-            display = false;
-        }
-
-        tr[i].style.display = display ? "" : "none";
-    }
 }
 </script>
 
