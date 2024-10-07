@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "
-SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year 
+SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year, e.exam_comment 
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
 ";
@@ -97,7 +97,8 @@ if ($result === false) {
                 <th>EXAM_ROOM</th>
                 <th>Exam File</th>
                 <th>Download</th>
-                <th>STATUS</th>   
+                <th>STATUS</th>
+                <th>COMMENT</th>
             </tr>
         </thead>
         <tbody id="examTableBody">
@@ -138,15 +139,40 @@ if ($result === false) {
                             <option value='Printed' " . ($row['exam_status'] === 'Printed' ? 'selected' : '') . ">Printed</option>
                         </select>
                     </td>";
+
+                    // แสดงปุ่มเพื่อดูคอมเมนต์ในป๊อบอัพ
+                    echo "<td>
+                        <button class='btn btn-info' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button>
+                    </td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='8'>No subjects found</td></tr>"; 
+                echo "<tr><td colspan='12'>No subjects found</td></tr>"; 
             }
             ?>
         </tbody>
     </table>
 </main>
+
+<!-- Modal สำหรับแสดงคอมเมนต์ -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Exam Comment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="commentContent">
+                <!-- คอมเมนต์จะมาแสดงตรงนี้ -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
@@ -185,24 +211,25 @@ function filterBySemesterAndYear() {
     for (let i = 0; i < tr.length; i++) {
         let tdSemester = tr[i].getElementsByTagName("td")[2];
         let tdYear = tr[i].getElementsByTagName("td")[4];
-        let display = true;
 
-        if (semester && tdSemester.innerHTML !== semester) {
-            display = false;
+        if (tdSemester && tdYear) {
+            let semesterValue = tdSemester.textContent || tdSemester.innerText;
+            let yearValue = tdYear.textContent || tdYear.innerText;
+
+            if ((semester === "" || semester === semesterValue) && (year === "" || year === yearValue)) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
         }
-
-        if (year && tdYear.innerHTML !== year) {
-            display = false;
-        }
-
-        tr[i].style.display = display ? "" : "none";
     }
+}
+
+function viewComment(comment) {
+    document.getElementById("commentContent").textContent = comment;
+    $('#commentModal').modal('show');
 }
 </script>
 
 </body>
 </html>
-
-<?php
-$conn->close();
-?>
