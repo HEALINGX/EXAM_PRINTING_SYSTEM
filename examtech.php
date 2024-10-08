@@ -57,7 +57,10 @@ $resultExams = $conn->query($sql);
         <h4>Dashboard</h4>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" href="#">All Users</a>
+                <a class="nav-link" href="examtech.php" onclick="setActive(this)">Manage Subject</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Tech_view_exam.php" onclick="setActive(this)">View Exam/Back up</a>
             </li>
         </ul>
     </div>
@@ -121,7 +124,7 @@ $resultExams = $conn->query($sql);
                             <input type="text" class="form-control" id="sub_department" name="sub_department" required>
                         </div>
                         <div class="form-group">
-                            <label for="sub_detail">Details</label>
+                            <label for="sub_detail">Subject Details</label>
                             <textarea class="form-control" id="sub_detail" name="sub_detail" required></textarea>
                         </div>
                         <div class="form-group">
@@ -345,6 +348,17 @@ function editExam(examData) {
         }
     }
 
+</script>
+
+<script>
+function setActive(element) {
+    // Remove active class from all links
+    const links = document.querySelectorAll('.nav-link');
+    links.forEach(link => link.classList.remove('active'));
+
+    // Add active class to the clicked link
+    element.classList.add('active');
+}
 </script>
 </body>
 </html>

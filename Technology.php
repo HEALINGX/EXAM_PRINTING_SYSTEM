@@ -20,7 +20,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "
-SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year 
+SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year,e.exam_comment 
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
 ";
@@ -61,7 +61,7 @@ if ($result === false) {
 </aside>
 
 <!-- Main Content -->
-<main class="container mt-5 pt-10">
+<main class="container mt-5 pt-5" style="margin-left: 400px;">
     <h2>Download Exam File</h2>
     <div class="search-bar mb-3">
         <input type="text" class="form-control" id="searchInput" placeholder="Search Subject..." onkeyup="searchUsers()">
@@ -95,6 +95,7 @@ if ($result === false) {
                 <th>EXAM_START</th>
                 <th>EXAM_END</th>
                 <th>EXAM_ROOM</th>
+                <th>COMMENT</th>
                 <th>Exam File</th>
                 <th>Download</th>
                 <th>STATUS</th>   
@@ -113,6 +114,7 @@ if ($result === false) {
                     echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
+                    echo "<td> <button class='btn btn-info' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button> </td>";
                     echo "<td>";
                     if ($row['pdf_path']) {
                         echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary' style='background-color: #6f42c1; border-color: #6f42c1;'>View File</a>";
@@ -147,6 +149,28 @@ if ($result === false) {
         </tbody>
     </table>
 </main>
+
+<!-- Modal สำหรับแสดงคอมเมนต์ -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Exam Comment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="commentContent">
+                <!-- คอมเมนต์จะมาแสดงตรงนี้ -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
@@ -198,6 +222,12 @@ function filterBySemesterAndYear() {
         tr[i].style.display = display ? "" : "none";
     }
 }
+
+function viewComment(comment) {
+    document.getElementById("commentContent").textContent = comment;
+    $('#commentModal').modal('show');
+}
+
 </script>
 
 </body>

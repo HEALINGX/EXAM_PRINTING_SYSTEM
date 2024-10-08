@@ -74,6 +74,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["pdf_file"]) && isset(
     }
 }
 
+// Handle comment submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['comment']) && isset($_POST['sub_id'])) {
+    $comment = $_POST['comment'];
+    $sub_id = $_POST['sub_id'];
+
+    // Update the comment in the database
+    $sql = "UPDATE exam SET exam_comment = ? WHERE sub_id = ?";
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        die("SQL Error: " . $conn->error);
+    }
+    $stmt->bind_param("si", $comment, $sub_id);
+
+    if ($stmt->execute()) {
+        echo "Comment updated successfully.";
+    } else {
+        echo "Error updating comment: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
 // Fetch user information from the database using user_id from session
 $user_id = $_SESSION["user_id"];
 $sql = "
@@ -89,7 +111,8 @@ SELECT
     e.exam_end, 
     e.exam_status, 
     e.exam_room,
-    e.pdf_path
+    e.pdf_path,
+    e.exam_comment
 FROM 
     exam e
 JOIN 
@@ -182,6 +205,7 @@ $conn->close();
                 <th>Exam Status</th>
                 <th>Exam Room</th>
                 <th>Upload File</th>
+                <th>Comment</th>
             </tr>
         </thead>
         <tbody>
@@ -194,14 +218,7 @@ $conn->close();
                 <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_year']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_start']) . ' - ' . htmlspecialchars($row['exam_end']); ?></td>
-                <td>
-                    <select onchange='updateStatus("<?php echo htmlspecialchars($row["sub_id"]); ?>", this.value)'>
-                        <option value=''>Select Status</option>
-                        <option value='Not Uploaded' <?php if ($row['exam_status'] === 'Not Uploaded') echo 'selected'; ?>>Not Uploaded</option>
-                        <option value='Uploaded' <?php if ($row['exam_status'] === 'Uploaded') echo 'selected'; ?>>Uploaded</option>
-                        <option value='Printed' <?php if ($row['exam_status'] === 'Printed') echo 'selected'; ?>>Printed</option>
-                    </select>
-                </td>
+                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
 
                 <td><?php echo htmlspecialchars($row['exam_room']); ?></td>
                 <td>
@@ -214,81 +231,91 @@ $conn->close();
                         </button>
                     </form>
                 </td>
+                <td>
+                    <button class="btn btn-warning" onclick="openCommentModal('<?php echo $row['sub_id']; ?>', '<?php echo htmlspecialchars($row['exam_comment']); ?>')">Edit Comment</button>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
 </main>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Modal for editing comment -->
+<div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Edit Comment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="sub_id" id="commentSubId">
+                    <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-function updateStatus(subId, status) {
-    if (status) {
-        fetch('update_status.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ sub_id: subId, exam_status: status })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload(); // Reload the page to reflect changes
-            } else {
-                alert('Error updating status');
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
+function openCommentModal(subId, comment) {
+    // Set the comment text and subject ID to the modal
+    document.getElementById('commentSubId').value = subId;
+    document.getElementById('comment').value = comment;
+
+    // Show the modal
+    $('#commentModal').modal('show');
 }
 
 function searchSubject() {
-    var input, filter, table, tr, td, i, j, txtValue;
+    var input, filter, table, tr, td, i, txtValue;
     input = document.getElementById("searchInput");
     filter = input.value.toUpperCase();
     table = document.getElementById("userTable");
     tr = table.getElementsByTagName("tr");
-
-    for (i = 1; i < tr.length; i++) {
-        tr[i].style.display = "none"; // Initially hide all rows
-        td = tr[i].getElementsByTagName("td");
-        for (j = 0; j < td.length; j++) {
-            if (td[j]) {
-                txtValue = td[j].textContent || td[j].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = ""; // Show the row if it matches
-                    break;
-                }
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1]; // Assuming the subject name is in the second column
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
             }
-        }
+        }       
     }
 }
 
 function filterBySemesterAndYear() {
-    var semesterSelect = document.getElementById("semesterSelect").value;
-    var yearSelect = document.getElementById("yearSelect").value;
-    var table, tr, td, i;
+    var semester = document.getElementById("semesterSelect").value;
+    var year = document.getElementById("yearSelect").value;
+    var table = document.getElementById("userTable");
+    var tr = table.getElementsByTagName("tr");
 
-    table = document.getElementById("userTable");
-    tr = table.getElementsByTagName("tr");
-
-    for (i = 1; i < tr.length; i++) {
-        tr[i].style.display = "none"; // Initially hide all rows
-        td = tr[i].getElementsByTagName("td");
-
-        var semesterMatch = semesterSelect === "" || td[3].innerText === semesterSelect;
-        var yearMatch = yearSelect === "" || td[5].innerText === yearSelect;
-
-        if (semesterMatch && yearMatch) {
-            tr[i].style.display = ""; // Show the row if it matches both criteria
+    for (var i = 0; i < tr.length; i++) {
+        var tdSemester = tr[i].getElementsByTagName("td")[3]; // Assuming semester is in the 4th column
+        var tdYear = tr[i].getElementsByTagName("td")[5]; // Assuming year is in the 6th column
+        if (tdSemester && tdYear) {
+            var semesterValue = tdSemester.textContent || tdSemester.innerText;
+            var yearValue = tdYear.textContent || tdYear.innerText;
+            if ((semester === "" || semesterValue === semester) && (year === "" || yearValue === year)) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
         }
     }
 }
 </script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

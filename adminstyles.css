@@ -27,10 +27,7 @@ body {
     font-weight: 500;
 }
 
-.sidebar a:hover, .sidebar a.active {
-    background-color: #7289da;
-    color: white;
-}
+
 
 .container {
     margin-left: 500px; 
@@ -145,6 +142,30 @@ h2 {
     min-width: 100px; /* กำหนดความกว้างขั้นต่ำของปุ่ม */
 }
 
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+    font-weight: bold;
+    text-transform: capitalize;
+}
 
+.statusnotuploaded {
+    background-color: #f9e79f; /* สีเหลือง */
+    color: #856404;
+    border: 1px solid #f7dc6f;
+}
+
+.statusuploaded {
+    background-color: #d4efdf; /* สีเขียว */
+    color: #1e8449;
+    border: 1px solid #82e0aa;
+}
+
+.statusprinted {
+    background-color: #d6eaf8; /* สีฟ้า */
+    color: #2e86c1;
+    border: 1px solid #aed6f1;
+}
 
 
