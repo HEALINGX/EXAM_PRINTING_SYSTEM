@@ -56,6 +56,9 @@ if ($result === false) {
             <li class="nav-item">
                 <a class="nav-link active" href="#">All Subject</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="coverpage.php">Cover Page</a>
+            </li>
         </ul>
     </div>
 </aside>
@@ -226,6 +229,19 @@ function filterBySemesterAndYear() {
 function viewComment(comment) {
     document.getElementById("commentContent").textContent = comment;
     $('#commentModal').modal('show');
+}
+
+// Function to show tab
+function showTab(tabId, element) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    document.getElementById(tabId).style.display = 'block';
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    element.classList.add('active');
 }
 
 </script>
