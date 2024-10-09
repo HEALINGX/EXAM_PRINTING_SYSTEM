@@ -143,7 +143,10 @@ $row = $result->fetch_assoc();
 
 <main class="container mt-5 pt-5">
     <div id="printPageText">
-        <div class="header-text">คณะวิทยาศาสตร์</div>
+    <div class="header-text">
+            <img src="logo.png" alt="Logo" style="max-width: 100px; height: auto; display: block; margin: 0 auto;">
+            คณะวิทยาศาสตร์
+        </div>
 
         <div class="content-section">
             <span class="left-section">การสอบวิชา <?php echo htmlspecialchars($row['sub_nameTH']); ?></span>
