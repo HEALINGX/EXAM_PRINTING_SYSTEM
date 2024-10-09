@@ -34,13 +34,12 @@ if (isset($_GET['backup_success'])) {
 
 // คำสั่ง SQL ที่ใช้ในการดึงข้อมูล
 $sql = "
-SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year, e.exam_comment, e.exam_id, b.pdf_path
+SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year, e.exam_comment, e.exam_id
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
-LEFT JOIN backup b ON e.exam_id = b.exam_id
 ";
-$result = $conn->query($sql);
 
+$result = $conn->query($sql);
 if ($result === false) {
     die("SQL Error: " . $conn->error);
 }
@@ -63,6 +62,19 @@ if ($result === false) {
     <button class="btn btn-danger ml-auto" onclick="location.href='logout.php'">Logout</button>
 </header>
 
+<aside class="sidebar bg-dark text-white">
+    <div class="p-4">
+        <h4>Dashboard</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="examtech.php" onclick="setActive(this)">Manage Subject</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Tech_view_exam.php" onclick="setActive(this)">View Exam/Back up</a>
+            </li>
+        </ul>
+    </div>
+</aside>
 <!-- Alert Message -->
 <div class="container mt-5 pt-5">
     <?php if (!empty($alert_message)) : ?>
@@ -71,21 +83,6 @@ if ($result === false) {
         </div>
     <?php endif; ?>
 </div>
-
-<!-- Sidebar -->
-<aside class="sidebar bg-dark text-white">
-    <div class="p-4">
-        <h4>Dashboard</h4>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link active" href="examtech.php" onclick="setActive(this)">Manage Subject</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="Tech_view_exam.php" onclick="setActive(this)">View Exam/Back up</a>
-            </li>
-        </ul>
-    </div>
-</aside>
 
 <!-- Main Content -->
 <main class="container mt-5 pt-5" style="margin-left: 400px;">
@@ -133,10 +130,11 @@ if ($result === false) {
                     echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
-        
+
                     echo "<td>";
-                    if ($row['pdf_path']) {
-                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary' style='background-color: #6f42c1; border-color: #6f42c1;'>View File</a>";
+                    if (!empty($row['pdf_path'])) {  // ตรวจสอบว่ามี pdf_path หรือไม่
+                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary'>View File</a>";
+                        // แสดงปุ่ม Backup
                         echo " <a href='backup.php?exam_id=" . htmlspecialchars($row['exam_id']) . "' class='btn btn-danger'>Backup</a>";
                     } else {
                         echo "<span class='text-danger'>No file available</span>";
@@ -158,17 +156,16 @@ if ($result === false) {
 
 <script>
 function searchUsers() {
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("searchInput");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("userTable");
-    tr = table.getElementsByTagName("tr");
+    var input = document.getElementById("searchInput");
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("userTable");
+    var tr = table.getElementsByTagName("tr");
 
-    for (i = 1; i < tr.length; i++) {
+    for (var i = 1; i < tr.length; i++) {
         tr[i].style.display = "none";
-        td = tr[i].getElementsByTagName("td");
+        var td = tr[i].getElementsByTagName("td");
         if (td.length > 0) {
-            txtValue = td[1].textContent || td[1].innerText;
+            var txtValue = td[1].textContent || td[1].innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
                 tr[i].style.display = "";
             }
@@ -181,14 +178,12 @@ function filterBySemesterAndYear() {
     var yearSelect = document.getElementById("yearSelect");
     var semesterFilter = semesterSelect.value;
     var yearFilter = yearSelect.value;
-    var table, tr, td, i;
+    var table = document.getElementById("userTable");
+    var tr = table.getElementsByTagName("tr");
 
-    table = document.getElementById("userTable");
-    tr = table.getElementsByTagName("tr");
-
-    for (i = 1; i < tr.length; i++) {
+    for (var i = 1; i < tr.length; i++) {
         tr[i].style.display = "none";
-        td = tr[i].getElementsByTagName("td");
+        var td = tr[i].getElementsByTagName("td");
         if (td.length > 0) {
             var semesterMatch = (semesterFilter === "" || td[2].innerText === semesterFilter);
             var yearMatch = (yearFilter === "" || td[4].innerText === yearFilter);

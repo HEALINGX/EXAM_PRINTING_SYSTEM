@@ -58,8 +58,8 @@ $row = $result->fetch_assoc();
 
     #printPageText {
         width: 100%; /* ขนาด A4 กว้าง */
-        height: 100%; /* ขนาด A4 สูง */
-        padding: 2cm; /* ขอบรอบเนื้อหา */
+        height: auto; /* ขนาด A4 สูง */
+        padding: 1cm; /* ขอบรอบเนื้อหา */
         margin: 0 auto; /* จัดกึ่งกลางแนวนอน */
         border: 1px solid black;
         font-size: 14px;
@@ -75,7 +75,7 @@ $row = $result->fetch_assoc();
     .header-text {
         text-align: center; /* จัดข้อความให้อยู่ตรงกลางแนวนอน */
         font-weight: bold;
-        font-size: 24px; /* เพิ่มขนาดตัวอักษรเพื่อให้ดูเด่นขึ้น */
+        font-size: 40px; /* เพิ่มขนาดตัวอักษรเพื่อให้ดูเด่นขึ้น */
         margin-bottom: 20px;
         width: 100%; /* ทำให้ข้อความขยายเต็มความกว้างของ container */
     }

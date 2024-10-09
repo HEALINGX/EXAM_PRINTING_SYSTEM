@@ -41,6 +41,7 @@ $resultExams = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="adminstyles.css"> 
 </head>
 <body>
@@ -252,18 +253,22 @@ $resultExams = $conn->query($sql);
             if ($resultExams->num_rows > 0) {
                 while ($row = $resultExams->fetch_assoc()) {
                     echo "<tr>
-                            <td>" . htmlspecialchars($row['sub_nameEN']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_date']) . "</td>
-                            <td>" . htmlspecialchars($row['sub_semester']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_year']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_room']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>
-                            <td>" . htmlspecialchars($row['user_firstname']) . "  " . htmlspecialchars($row['user_lastname']) . "</td>
-                            <td>
-                                <button class='btn btn-warning' onclick='editExam(" . json_encode($row) . ")'>Edit</button>
-                                <a href='delete_subject.php?sub_id=" . htmlspecialchars($row['sub_id']) . "' class='btn btn-danger' onclick='return confirm(`Are you sure you want to delete this Subject?`);'>Delete</a>
-                            </td>
-                          </tr>";
+                    <td>" . htmlspecialchars($row['sub_nameEN']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_date']) . "</td>
+                    <td>" . htmlspecialchars($row['sub_semester']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_year']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_room']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>
+                    <td>" . htmlspecialchars($row['user_firstname']) . " " . htmlspecialchars($row['user_lastname']) . "</td>
+                    <td>
+                        <button class='btn btn-warning' onclick='editExam(" . json_encode($row) . ")'>
+                            <i class='bi bi-pencil'></i>
+                        </button>
+                        <a href='delete_subject.php?sub_id=" . htmlspecialchars($row['sub_id']) . "' class='btn btn-danger' onclick='return confirm(`Are you sure you want to delete this Subject?`);'>
+                            <i class='bi bi-trash'></i> </a>
+                    </td>
+                </tr>";
+
                 }
             } else {
                 echo "<tr><td colspan='6'>No exams found</td></tr>";

@@ -199,13 +199,14 @@ $conn->close();
                 <th>Subject Name(TH)</th>
                 <th>Subject Name(ENG)</th>
                 <th>Subject Semester</th>
-                <th style="width: 50%;">Exam Date</th>
+                <th>Exam Date</th>
                 <th>Exam Year</th>
                 <th>Exam Time</th>
-                <th>Exam Status</th>
                 <th>Exam Room</th>
-                <th>Upload File</th>
                 <th>Comment</th>
+                <th>Upload File</th>
+                <th>Exam Status</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -218,22 +219,21 @@ $conn->close();
                 <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_year']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_start']) . ' - ' . htmlspecialchars($row['exam_end']); ?></td>
-                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
-
                 <td><?php echo htmlspecialchars($row['exam_room']); ?></td>
+                <td>
+                    <button class="btn btn-success" onclick="openCommentModal('<?php echo $row['sub_id']; ?>', '<?php echo htmlspecialchars($row['exam_comment']); ?>')">Edit Comment</button>
+                </td>
                 <td>
                     <form action="" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="sub_id" value="<?php echo htmlspecialchars($row['sub_id']); ?>">
-                        <input type="file" name="pdf_file" required <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>>
+                        <input type="file" name="pdf_file" required <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>><br>
                         <button type="submit" class="btn btn-primary <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>" 
                             style="<?php if ($row['exam_status'] === 'Printed') echo 'background-color: grey; border-color: grey; cursor: not-allowed;'; ?>">
                             Upload
                         </button>
                     </form>
                 </td>
-                <td>
-                    <button class="btn btn-warning" onclick="openCommentModal('<?php echo $row['sub_id']; ?>', '<?php echo htmlspecialchars($row['exam_comment']); ?>')">Edit Comment</button>
-                </td>
+                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

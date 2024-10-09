@@ -117,7 +117,7 @@ if ($result === false) {
                     echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
-                    echo "<td> <button class='btn btn-info' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button> </td>";
+                    echo "<td> <button class='btn btn-success' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button> </td>";
                     echo "<td>";
                     if ($row['pdf_path']) {
                         echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary' style='background-color: #6f42c1; border-color: #6f42c1;'>View File</a>";

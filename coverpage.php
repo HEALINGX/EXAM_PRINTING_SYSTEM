@@ -39,6 +39,9 @@ if ($result === false) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cover Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
     <link rel="stylesheet" href="adminstyles.css">
 </head>
 <body>
@@ -48,6 +51,20 @@ if ($result === false) {
     <a class="navbar-brand" href="#">Exam Printing</a>
     <button class="btn btn-danger ml-auto" onclick="location.href='logout.php'">Logout</button>
 </header>
+<!-- Sidebar -->
+<aside class="sidebar bg-dark text-white">
+    <div class="p-4">
+        <h4>Dashboard</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="Technology.php">All Subject</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="coverpage.php">Cover Page</a>
+            </li>
+        </ul>
+    </div>
+</aside>
 
 <main class="container mt-5 pt-5">
     <h2>Cover Page</h2>
@@ -72,49 +89,53 @@ if ($result === false) {
         </select>
     </div>
 
+    
     <!-- Cover Page Table -->
     <table class="table" id="coverTable">
-        <thead class="thead-dark">
-            <tr>
-                <th>ID</th>
-                <th>NAME</th>
-                <th>EXAM_SEMESTER</th>
-                <th>EXAM_DATE</th>
-                <th>EXAM_YEAR</th>
-                <th>EXAM_START</th>
-                <th>EXAM_END</th>
-                <th>EXAM_ROOM</th>
-                <th>COMMENT</th>
-                <th>PRINT PAGE</th>
-            </tr>
-        </thead>
-        <tbody id="coverTableBody">
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr id='row_" . htmlspecialchars($row['sub_id']) . "'>";
-                    echo "<td>" . htmlspecialchars($row['sub_id']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_nameTH']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
-                    echo "<td>
-                        <button class='btn btn-info' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button>
-                    </td>";
-                    echo "<td>
-                        <button class='btn btn-info' onclick='window.location.href=\"print_page.php?sub_id=" . htmlspecialchars($row['sub_id']) . "\"'>View Print Page</button>
-                    </td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='10'>No subjects found</td></tr>";
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>NAME</th>
+            <th>EXAM_SEMESTER</th>
+            <th>EXAM_DATE</th>
+            <th>EXAM_YEAR</th>
+            <th>EXAM_START</th>
+            <th>EXAM_END</th>
+            <th>EXAM_ROOM</th>
+            <th>COMMENT</th>
+            <th style="width: 100px;">PRINT PAGE</th> <!-- เพิ่มความกว้างที่นี่ -->
+        </tr>
+    </thead>
+    <tbody id="coverTableBody">
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr id='row_" . htmlspecialchars($row['sub_id']) . "'>";
+                echo "<td>" . htmlspecialchars($row['sub_id']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['sub_nameTH']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_start']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_end']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_room']) . "</td>";
+                echo "<td>
+                    <button class='btn btn-success' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button>
+                </td>";
+                echo "<td style='width: 100px;'> <!-- เพิ่มความกว้างที่นี่ -->
+                    <button class='btn btn-info' onclick='window.location.href=\"print_page.php?sub_id=" . htmlspecialchars($row['sub_id']) . "\"'>
+                        <i class='fas fa-print'></i> 
+                    </button>
+                </td>";
+                echo "</tr>";
             }
-            ?>
-        </tbody>
-    </table>
+        } else {
+            echo "<tr><td colspan='10'>No subjects found</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
 </main>
 
 <!-- Comment Modal -->
