@@ -117,7 +117,8 @@ if ($result === false) {
                 <th>EXAM_SEMESTER</th>
                 <th>EXAM_DATE</th>
                 <th>EXAM_YEAR</th>
-                <th>Exam File</th>
+                <th>Exam Status</th>
+                <th>ACTION</th>
             </tr>
         </thead>
         <tbody id="examTableBody">
@@ -130,7 +131,7 @@ if ($result === false) {
                     echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
-
+                    echo "<td>" . htmlspecialchars($row['exam_status']) . "</td>";
                     echo "<td>";
                     if (!empty($row['pdf_path'])) {  // ตรวจสอบว่ามี pdf_path หรือไม่
                         echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary'>View File</a>";
