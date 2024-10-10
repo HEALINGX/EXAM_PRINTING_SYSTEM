@@ -112,7 +112,7 @@ SELECT
     e.exam_status, 
     e.exam_room,
     e.pdf_path,
-    e.exam_comment -- เพิ่มคอลัมน์คอมเมนต์ที่นี่
+    e.exam_comment
 FROM 
     exam e
 JOIN 
@@ -199,13 +199,14 @@ $conn->close();
                 <th>Subject Name(TH)</th>
                 <th>Subject Name(ENG)</th>
                 <th>Subject Semester</th>
-                <th style="width: 50%;">Exam Date</th>
+                <th>Exam Date</th>
                 <th>Exam Year</th>
                 <th>Exam Time</th>
-                <th>Exam Status</th>
                 <th>Exam Room</th>
                 <th>Comment</th>
                 <th>Upload File</th>
+                <th>Exam Status</th>
+                
             </tr>
         </thead>
         <tbody>
@@ -218,72 +219,103 @@ $conn->close();
                 <td><?php echo htmlspecialchars($row['exam_date']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_year']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_start']) . ' - ' . htmlspecialchars($row['exam_end']); ?></td>
-                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
                 <td><?php echo htmlspecialchars($row['exam_room']); ?></td>
                 <td>
-                    <button class="btn btn-primary" onclick="openCommentModal('<?php echo htmlspecialchars($row['sub_id']); ?>', '<?php echo htmlspecialchars($row['exam_comment']); ?>')">Edit Comment</button>
+                    <button class="btn btn-success" onclick="openCommentModal('<?php echo $row['sub_id']; ?>', '<?php echo htmlspecialchars($row['exam_comment']); ?>')">Edit Comment</button>
                 </td>
                 <td>
-                    <form method="POST" enctype="multipart/form-data">
+                    <form action="" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="sub_id" value="<?php echo htmlspecialchars($row['sub_id']); ?>">
-                        <input type="file" name="pdf_file" accept=".pdf" required>
-                        <input type="submit" value="Upload" class="btn btn-success">
+                        <input type="file" name="pdf_file" required <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>><br>
+                        <button type="submit" class="btn btn-primary <?php if ($row['exam_status'] === 'Printed') echo 'disabled'; ?>" 
+                            style="<?php if ($row['exam_status'] === 'Printed') echo 'background-color: grey; border-color: grey; cursor: not-allowed;'; ?>">
+                            Upload
+                        </button>
                     </form>
                 </td>
+                <td><?php echo htmlspecialchars($row['exam_status']); ?></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
     </table>
 </main>
 
-<!-- Comment Modal -->
+<!-- Modal for editing comment -->
 <div class="modal fade" id="commentModal" tabindex="-1" role="dialog" aria-labelledby="commentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="commentModalLabel">Edit Comment</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="commentForm" method="POST">
-                    <div class="form-group">
-                        <label for="comment">Comment</label>
-                        <textarea class="form-control" id="comment" name="comment" required></textarea>
-                        <input type="hidden" name="sub_id" id="commentSubId">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Comment</button>
-                </form>
-            </div>
+            <form action="" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Edit Comment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="sub_id" id="commentSubId">
+                    <textarea name="comment" id="comment" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-function openCommentModal(subId, currentComment) {
+function openCommentModal(subId, comment) {
+    // Set the comment text and subject ID to the modal
+    document.getElementById('commentSubId').value = subId;
+    document.getElementById('comment').value = comment;
+
+    // Show the modal
     $('#commentModal').modal('show');
-    $('#comment').val(currentComment);
-    $('#commentSubId').val(subId);
-}
-
-function updateStatus(subId, status) {
-    // Make an AJAX call to update the status in the database
-    // (Add your AJAX implementation here if needed)
-}
-
-// Filter and search functions (You can implement these as needed)
-function filterBySemesterAndYear() {
-    // Add your filter implementation here
 }
 
 function searchSubject() {
-    // Add your search implementation here
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("userTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1]; // Assuming the subject name is in the second column
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}
+
+function filterBySemesterAndYear() {
+    var semester = document.getElementById("semesterSelect").value;
+    var year = document.getElementById("yearSelect").value;
+    var table = document.getElementById("userTable");
+    var tr = table.getElementsByTagName("tr");
+
+    for (var i = 0; i < tr.length; i++) {
+        var tdSemester = tr[i].getElementsByTagName("td")[3]; // Assuming semester is in the 4th column
+        var tdYear = tr[i].getElementsByTagName("td")[5]; // Assuming year is in the 6th column
+        if (tdSemester && tdYear) {
+            var semesterValue = tdSemester.textContent || tdSemester.innerText;
+            var yearValue = tdYear.textContent || tdYear.innerText;
+            if ((semester === "" || semesterValue === semester) && (year === "" || yearValue === year)) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
 }
 </script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

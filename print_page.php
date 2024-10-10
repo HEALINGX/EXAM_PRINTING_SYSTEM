@@ -26,7 +26,7 @@ if ($conn->connect_error) {
 
 $sub_id = $_GET['sub_id'];
 $sql = "
-SELECT s.sub_id, s.sub_nameTH, s.sub_section, e.exam_date, e.exam_semester, e.exam_start, e.exam_end, e.exam_comment, e.exam_room, e.pdf_path, e.exam_status, e.exam_year, u.user_firstname, u.user_lastname, u.user_tel
+SELECT s.sub_id, s.sub_nameTH, s.sub_section, e.exam_date, s.sub_semester, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year, e.exam_comment, u.user_firstname, u.user_lastname, u.user_tel
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
 JOIN user u ON s.teach_id = u.user_id
@@ -52,126 +52,169 @@ $row = $result->fetch_assoc();
     <title>Print Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Style for print page content */
+    body {
+        font-family: 'TH SarabunPSK', sans-serif;
+    }
+
+    #printPageText {
+        width: 100%; /* ขนาด A4 กว้าง */
+        height: auto; /* ขนาด A4 สูง */
+        padding: 1cm; /* ขอบรอบเนื้อหา */
+        margin: 0 auto; /* จัดกึ่งกลางแนวนอน */
+        border: 1px solid black;
+        font-size: 14px;
+        line-height: 1.6;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* จัดให้อยู่กึ่งกลางในแนวตั้ง */
+        align-items: center; /* จัดให้อยู่กึ่งกลางในแนวนอน */
+        text-align: center; /* จัดข้อความให้อยู่กึ่งกลาง */
+    }
+
+    .header-text {
+        text-align: center; /* จัดข้อความให้อยู่ตรงกลางแนวนอน */
+        font-weight: bold;
+        font-size: 40px; /* เพิ่มขนาดตัวอักษรเพื่อให้ดูเด่นขึ้น */
+        margin-bottom: 20px;
+        width: 100%; /* ทำให้ข้อความขยายเต็มความกว้างของ container */
+    }
+
+    .left-section {
+        text-align: left;
+    }
+
+    .right-section {
+        text-align: right;
+    }
+
+    .content-section {
+        display: flex;
+        justify-content: space-between; /* จัดให้องค์ประกอบซ้ายขวาห่างกัน */
+        width: 100%;
+    }
+
+    .content-section2 {
+        display: flex;
+        justify-content: center; /* จัดให้องค์ประกอบซ้ายขวาห่างกัน */
+        width: 100%;
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #printPageText, #printPageText * {
+            visibility: visible;
+        }
+
         #printPageText {
-            width: 100%; /* Full width */
-            max-width: 210mm; /* A4 width */
-            margin: 0 auto; /* Center alignment */
-            padding: 20mm; /* Padding for content */
-            font-size: 12px; /* Adjust font size */
-            line-height: 1.5; /* Improve line spacing */
-            overflow-wrap: break-word; /* Handle long words */
+            position: absolute;
+            left: 0;
+            top: 0;
+            margin: auto;
         }
 
-        /* Center the image */
-        .image-container {
-            text-align: center; /* Center alignment */
-            margin-bottom: 20px; /* Add some space below the image */
+        button {
+            display: none; /* ซ่อนปุ่มตอนพิมพ์ */
         }
 
-        /* Media query for print */
-        @media print {
-            body {
-                margin: 0; /* Remove default margin */
-            }
-
-            body * {
-                visibility: hidden; /* Hide everything except for the modal */
-            }
-
-            #printPageText, #printPageText * {
-                visibility: visible; /* Show only the print content */
-            }
-
-            #printPageText {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 210mm; /* A4 width */
-                height: 297mm; /* A4 height */
-                box-sizing: border-box; /* Include padding in width/height */
-            }
-
-            /* Adjust styles for printed content */
-            pre {
-                white-space: pre-wrap; /* Preserve whitespace */
-                word-wrap: break-word; /* Handle long words */
-                margin: 0; /* Remove default margins */
-                font-size: 12px; /* Maintain font size */
-                line-height: 1.6; /* Improved line spacing for print */
-            }
+        /* ปรับขนาดตัวอักษรในโหมดพิมพ์ */
+        #printPageText {
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-    </style>
+
+        .header-text {
+            font-size: 20px; /* ขนาดหัวเรื่องใหญ่ขึ้น */
+        }
+    }
+</style>
+    <script>
+        function printContent() {
+            window.print();
+        }
+    </script>
 </head>
 <body>
 
 <main class="container mt-5 pt-5">
     <div id="printPageText">
-        <pre>
-                                                                                             คณะวิทยาศาสตร์
-        การสอบวิชา <?php echo htmlspecialchars($row['sub_nameTH']); ?>                                                รหัสวิชา <?php echo htmlspecialchars($row['sub_id']); ?>
-        สอบวันที่ <?php echo htmlspecialchars($row['exam_date']); ?> เวลา <?php echo htmlspecialchars($row['exam_start']); ?> – <?php echo htmlspecialchars($row['exam_end']); ?> น.
-        ห้องสอบ <?php echo htmlspecialchars($row['exam_room']); ?> เลขประจำซอง........................
-        จำนวนนักศึกษา................คน
-        ซองนี้มีข้อสอบ................ชุด                                     นศ.คณะ................ตอน <?php echo htmlspecialchars($row['sub_section']); ?>
-        ข้อสอบสำรอง.....................ชุด
-        อุปกรณ์ที่ใช้หรือคำแนะนำผู้คุมสอบเพิ่มเติม
-        .......................................................................
-        .......................................................................
-        ผู้ออกข้อสอบ <?php echo htmlspecialchars($row['user_firstname']); ?> <?php echo htmlspecialchars($row['user_lastname']); ?> 
-        ห้องทำงาน...........................................................
-        โทรศัพท์มือถือ <?php echo htmlspecialchars($row['user_tel']); ?>
+    <div class="header-text">
+            <img src="logo.png" alt="Logo" style="max-width: 100px; height: auto; display: block; margin: 0 auto;">
+            คณะวิทยาศาสตร์
+        </div>
 
-        จำนวนนักศึกษาที่เข้าสอบ...............คน          จำนวนนักศึกษาที่ขาดสอบ...........คน คือ
-                รหัสนักศึกษา................................................
-                ชื่อ-สกุล......................................................
-                1................................................................................ผู้คุมสอบ
-                2................................................................................ผู้คุมสอบ
-                3................................................................................ผู้คุมสอบ
-                หมายเหตุ  <?php echo htmlspecialchars($row['exam_comment']); ?> 
-        </pre>
+        <div class="content-section">
+            <span class="left-section">การสอบวิชา <?php echo htmlspecialchars($row['sub_nameTH']); ?></span>
+            <span class="right-section">รหัสวิชา <?php echo htmlspecialchars($row['sub_id']); ?></span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">สอบวันที่ <?php echo htmlspecialchars($row['exam_date']); ?></span>
+            <span class="right-section">เวลา <?php echo htmlspecialchars($row['exam_start']); ?> – <?php echo htmlspecialchars($row['exam_end']); ?> น.</span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">ห้องสอบ <?php echo htmlspecialchars($row['exam_room']); ?></span>
+            <span class="right-section">เลขประจำซอง........................</span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">จำนวนนักศึกษา................คน</span>
+            <span class="right-section">นศ.คณะ................ตอน <?php echo htmlspecialchars($row['sub_section']); ?></span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">ข้อสอบสำรอง.....................ชุด</span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">อุปกรณ์ที่ใช้หรือคำแนะนำผู้คุมสอบเพิ่มเติม</span><br>
+            ...................................................................................................................................................................
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">ผู้ออกข้อสอบ <?php echo htmlspecialchars($row['user_firstname']); ?> <?php echo htmlspecialchars($row['user_lastname']); ?></span>
+            <span class="right-section">โทรศัพท์มือถือ <?php echo htmlspecialchars($row['user_tel']); ?></span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">จำนวนนักศึกษาที่เข้าสอบ...............คน</span>
+            <span class="right-section">จำนวนนักศึกษาที่ขาดสอบ...........คน</span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">รหัสนักศึกษา................................................</span>
+            <span class="right-section">ชื่อ-สกุล......................................................</span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">รหัสนักศึกษา................................................</span>
+            <span class="right-section">ชื่อ-สกุล......................................................</span>
+        </div>
+
+        <div class="content-section">
+            <span class="left-section">รหัสนักศึกษา................................................</span>
+            <span class="right-section">ชื่อ-สกุล......................................................</span>
+        </div>
+
+        <div class="content-section2">
+            1................................................................................ผู้คุมสอบ<br>
+            2................................................................................ผู้คุมสอบ<br>
+            3................................................................................ผู้คุมสอบ
+        </div>
+
+        <div class="content-section2">
+            หมายเหตุ..................................................................................
+        </div>
     </div>
 
     <button class="btn btn-primary" onclick="printContent()">Print</button>
 </main>
 
-<!-- Script Section -->
-<script>
-function printContent() {
-    const printContents = document.getElementById('printPageText').innerHTML;
-    const newWindow = window.open('', '_blank');
-    newWindow.document.write(`
-        <html>
-        <head>
-            <title>Print Page</title>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 0;
-                    padding: 20mm; /* Adjust padding for print */
-                }
-                pre {
-                    white-space: pre-wrap; /* Preserve whitespace */
-                    word-wrap: break-word; /* Handle long words */
-                    font-size: 12px; /* Maintain font size */
-                    line-height: 1.6; /* Improved line spacing for print */
-                }
-                .image-container {
-                    text-align: center; /* Center alignment */
-                }
-            </style>
-        </head>
-        <body>
-            <div class="image-container">
-                <img src="logo.png" alt="Description of image" width="250" height="200">
-            </div>
-            ${printContents}
-        </body>
-        </html>
-    `);
-    newWindow.document.close();
-    newWindow.print();
-}
-</script>
 </body>
 </html>

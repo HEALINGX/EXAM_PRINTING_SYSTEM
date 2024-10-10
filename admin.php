@@ -43,6 +43,7 @@ if ($result === false) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="adminstyles.css"> 
 </head>
 <body>
@@ -188,8 +189,12 @@ if ($result === false) {
                     echo "<td>" . htmlspecialchars($row['user_email']) . "</td>";
                     echo "<td>*********</td>";  
                     echo "<td>";
-                    echo "<a href='#' class='btn btn-warning btn-sm' onclick='openEditModal(" . htmlspecialchars($row['user_id']) . ")'>Edit</a>";
-                    echo "<a href='delete_user.php?delete_user=" . htmlspecialchars($row['user_id']) . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this user?\");'>Delete</a>";
+                    echo "<a href='#' class='btn btn-warning btn-sm me-4' onclick='openEditModal(" . htmlspecialchars($row['user_id']) . ")'>
+                            <i class='bi bi-pencil-fill'></i>
+                        </a>";
+                    echo "<a href='delete_user.php?delete_user=" . htmlspecialchars($row['user_id']) . "' class='btn btn-danger btn-sm ' onclick='return confirm(\"Are you sure you want to delete this user?\");'>
+                            <i class='bi bi-trash-fill'></i>
+                        </a>";
                     echo "</td>";
                     echo "</tr>";
                 }

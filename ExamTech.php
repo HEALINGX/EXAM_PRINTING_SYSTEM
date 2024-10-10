@@ -41,6 +41,7 @@ $resultExams = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="adminstyles.css"> 
 </head>
 <body>
@@ -57,7 +58,10 @@ $resultExams = $conn->query($sql);
         <h4>Dashboard</h4>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" href="#">All Users</a>
+                <a class="nav-link" href="examtech.php" onclick="setActive(this)">Manage Subject</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="Tech_view_exam.php" onclick="setActive(this)">View Exam/Back up</a>
             </li>
         </ul>
     </div>
@@ -121,7 +125,7 @@ $resultExams = $conn->query($sql);
                             <input type="text" class="form-control" id="sub_department" name="sub_department" required>
                         </div>
                         <div class="form-group">
-                            <label for="sub_detail">Details</label>
+                            <label for="sub_detail">Subject Details</label>
                             <textarea class="form-control" id="sub_detail" name="sub_detail" required></textarea>
                         </div>
                         <div class="form-group">
@@ -249,18 +253,22 @@ $resultExams = $conn->query($sql);
             if ($resultExams->num_rows > 0) {
                 while ($row = $resultExams->fetch_assoc()) {
                     echo "<tr>
-                            <td>" . htmlspecialchars($row['sub_nameEN']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_date']) . "</td>
-                            <td>" . htmlspecialchars($row['sub_semester']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_year']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_room']) . "</td>
-                            <td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>
-                            <td>" . htmlspecialchars($row['user_firstname']) . "  " . htmlspecialchars($row['user_lastname']) . "</td>
-                            <td>
-                                <button class='btn btn-warning' onclick='editExam(" . json_encode($row) . ")'>Edit</button>
-                                <a href='delete_subject.php?sub_id=" . htmlspecialchars($row['sub_id']) . "' class='btn btn-danger' onclick='return confirm(`Are you sure you want to delete this Subject?`);'>Delete</a>
-                            </td>
-                          </tr>";
+                    <td>" . htmlspecialchars($row['sub_nameEN']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_date']) . "</td>
+                    <td>" . htmlspecialchars($row['sub_semester']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_year']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_room']) . "</td>
+                    <td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>
+                    <td>" . htmlspecialchars($row['user_firstname']) . " " . htmlspecialchars($row['user_lastname']) . "</td>
+                    <td>
+                        <button class='btn btn-warning' onclick='editExam(" . json_encode($row) . ")'>
+                            <i class='bi bi-pencil'></i>
+                        </button>
+                        <a href='delete_subject.php?sub_id=" . htmlspecialchars($row['sub_id']) . "' class='btn btn-danger' onclick='return confirm(`Are you sure you want to delete this Subject?`);'>
+                            <i class='bi bi-trash'></i> </a>
+                    </td>
+                </tr>";
+
                 }
             } else {
                 echo "<tr><td colspan='6'>No exams found</td></tr>";
@@ -345,6 +353,17 @@ function editExam(examData) {
         }
     }
 
+</script>
+
+<script>
+function setActive(element) {
+    // Remove active class from all links
+    const links = document.querySelectorAll('.nav-link');
+    links.forEach(link => link.classList.remove('active'));
+
+    // Add active class to the clicked link
+    element.classList.add('active');
+}
 </script>
 </body>
 </html>
