@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "printing_exam";
+$dbname = "test2";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -97,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['comment']) && isset($_
 }
 
 // Fetch user information from the database using user_id from session
+// Fetch user information from the database using user_id from session
 $user_id = $_SESSION["user_id"];
 $sql = "
 SELECT 
@@ -118,11 +119,9 @@ FROM
 JOIN 
     subject s ON s.sub_id = e.sub_id
 JOIN 
-    teacher t ON t.user_id = s.teach_id
-JOIN 
-    user u ON u.user_id = t.user_id
+    user u ON u.user_id = s.teach_id
 WHERE 
-    t.user_id = ?";
+    u.user_id = ? AND u.user_role = 'teacher'";
 
 $stmt = $conn->prepare($sql);
 if ($stmt === false) {
@@ -138,6 +137,7 @@ if ($result === false) {
 
 $rows = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+
 $conn->close();
 ?>
 

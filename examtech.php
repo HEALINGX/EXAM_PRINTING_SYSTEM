@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "printing_exam";
+$dbname = "test2";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -83,14 +83,6 @@ $resultExams = $conn->query($sql);
             <option value="2">Semester 2</option>
         </select>
     </div>
-    <div class="year-selection mb-3">
-        <label for="yearSelect">Select Year:</label>
-        <select id="yearSelect" class="form-control" onchange="filterBySemesterAndYear()">
-            <option value="">All</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-        </select>
-    </div>
 
     <!-- Add Exam Modal -->
     <div class="modal fade" id="addExamModal" tabindex="-1" role="dialog" aria-labelledby="addExamModalLabel" aria-hidden="true">
@@ -131,6 +123,10 @@ $resultExams = $conn->query($sql);
                         <div class="form-group">
                             <label for="exam_date">Exam Date</label>
                             <input type="date" class="form-control" id="exam_date" name="exam_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exam_year">Exam Year</label>
+                            <input type="text" class="form-control" id="exam_year" name="exam_year" required>
                         </div>
                         <div class="form-group">
                             <label for="exam_room">Exam Room</label>
@@ -207,6 +203,10 @@ $resultExams = $conn->query($sql);
                         <input type="date" class="form-control" id="edit_exam_date" name="exam_date" required>
                     </div>
                     <div class="form-group">
+                            <label for="exam_year">Exam Year</label>
+                            <input type="text" class="form-control" id="exam_year" name="exam_year" required>
+                    </div>
+                    <div class="form-group">
                         <label for="edit_exam_room">Exam Room</label>
                         <input type="text" class="form-control" id="edit_exam_room" name="exam_room" required>
                     </div>
@@ -241,7 +241,6 @@ $resultExams = $conn->query($sql);
                 <th>Subject Name</th>
                 <th>Exam Date</th>
                 <th>Semester</th>
-                <th>Exam Year</th>
                 <th>Room</th>
                 <th>Time</th>
                 <th>Teacher Name</th>
@@ -255,8 +254,7 @@ $resultExams = $conn->query($sql);
                     echo "<tr>
                     <td>" . htmlspecialchars($row['sub_nameEN']) . "</td>
                     <td>" . htmlspecialchars($row['exam_date']) . "</td>
-                    <td>" . htmlspecialchars($row['sub_semester']) . "</td>
-                    <td>" . htmlspecialchars($row['exam_year']) . "</td>
+                    <td>" . htmlspecialchars($row['sub_semester']) . "</td>           
                     <td>" . htmlspecialchars($row['exam_room']) . "</td>
                     <td>" . htmlspecialchars($row['exam_start']) . " - " . htmlspecialchars($row['exam_end']) . "</td>
                     <td>" . htmlspecialchars($row['user_firstname']) . " " . htmlspecialchars($row['user_lastname']) . "</td>

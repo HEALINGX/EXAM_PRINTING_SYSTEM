@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "printing_exam";
+$dbname = "test2";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -39,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sub_detail = $conn->real_escape_string($_POST['sub_detail']);
     $exam_date = $conn->real_escape_string($_POST['exam_date']);
     $exam_room = $conn->real_escape_string($_POST['exam_room']);
+    $exam_year = $conn->real_escape_string($_POST['exam_room']);
     $exam_start = $conn->real_escape_string($_POST['exam_start']);
     $exam_end = $conn->real_escape_string($_POST['exam_end']);
     $teacher_id = $conn->real_escape_string($_POST['teacher_id']);
@@ -58,8 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         logData("Subject inserted successfully with ID $sub_id");
 
         // Insert exam
-        $insertExam = "INSERT INTO exam (sub_id, exam_date, exam_start, exam_end, exam_room, exam_status) 
-                        VALUES ('$sub_id', '$exam_date', '$exam_start', '$exam_end', '$exam_room', 'Scheduled')";
+        $insertExam = "INSERT INTO exam (sub_id, exam_date, exam_start, exam_end, exam_room,exam_year, exam_status) 
+                        VALUES ('$sub_id', '$exam_date', '$exam_start', '$exam_end', '$exam_room','$exam_year', 'Scheduled')";
 
         if ($conn->query($insertExam) === TRUE) {
             // Log exam insertion success

@@ -10,3 +10,34 @@
 [2024-10-06 20:32:02] Request to delete subject with ID: 14
 [2024-10-06 20:32:02] Related exams for subject with ID 14 deleted successfully
 [2024-10-06 20:32:02] Subject with ID 14 deleted successfully
+[2024-10-10 21:47:56] Form Data: sub_nameEN=TestSubject, sub_nameTH=ทดสอบวิชา, sub_semester=1, sub_section=A, sub_department=ทดสอบ, sub_detail=ทดสอบระบบ, exam_date=2024-10-11, exam_room=ROOM 333, exam_start=02:47, exam_end=03:48, teacher_id=21
+[2024-10-10 21:47:56] Error inserting subject: Cannot add or update a child row: a foreign key constraint fails (`printing_exam`.`subject`, CONSTRAINT `subject_ibfk_1` FOREIGN KEY (`teach_id`) REFERENCES `teacher` (`user_id`))
+[2024-10-10 21:51:16] Form Data: sub_nameEN=TestSubject, sub_nameTH=ทดสอบวิชา, sub_semester=1, sub_section=A, sub_department=ทดสอบ, sub_detail=ทดสอบระบบ, exam_date=2024-10-11, exam_room=ROOM 333, exam_start=02:47, exam_end=03:48, teacher_id=21
+[2024-10-10 21:51:16] Error inserting subject: Cannot add or update a child row: a foreign key constraint fails (`printing_exam`.`subject`, CONSTRAINT `subject_ibfk_1` FOREIGN KEY (`teach_id`) REFERENCES `teacher` (`user_id`))
+[2024-10-10 21:52:37] Error inserting subject: Cannot add or update a child row: a foreign key constraint fails (`printing_exam`.`subject`, CONSTRAINT `subject_ibfk_1` FOREIGN KEY (`teach_id`) REFERENCES `teacher` (`user_id`))
+[2024-10-10 22:22:37] Form Data: sub_nameEN=test, sub_nameTH=test, sub_semester=1, sub_section=A, sub_department=test, sub_detail=test, exam_date=2024-10-11, exam_room=ROOM 333, exam_start=03:22, exam_end=03:22, teacher_id=19
+[2024-10-10 22:22:37] Error inserting subject: Cannot add or update a child row: a foreign key constraint fails (`test2`.`subject`, CONSTRAINT `subject_ibfk_1` FOREIGN KEY (`teach_id`) REFERENCES `teacher` (`user_id`))
+[2024-10-10 22:25:07] Form Data: sub_nameEN=test, sub_nameTH=test, sub_semester=1, sub_section=A, sub_department=test, sub_detail=test, exam_date=2024-10-11, exam_room=ROOM 333, exam_start=03:22, exam_end=03:22, teacher_id=19
+[2024-10-10 22:25:07] Subject inserted successfully with ID 16
+[2024-10-10 22:25:07] Exam inserted successfully for subject ID 16
+[2024-10-10 22:34:35] Form Data: sub_nameEN=dsdasd, sub_nameTH=dsadasd, sub_semester=1, sub_section=A, sub_department=dddd, sub_detail=2321321, exam_date=2024-10-11, exam_room=111, exam_year=2024, exam_start=03:36, exam_end=03:39, teacher_id=19
+[2024-10-10 22:34:35] Subject inserted successfully with ID 17
+[2024-10-10 22:34:35] Exam inserted successfully for subject ID 17
+[2024-10-10 22:35:57] Request to delete subject with ID: 16
+[2024-10-10 22:35:57] Related exams for subject with ID 16 deleted successfully
+[2024-10-10 22:35:57] Subject with ID 16 deleted successfully
+[2024-10-10 22:36:46] Request to delete subject with ID: 17
+[2024-10-10 22:36:46] Related exams for subject with ID 17 deleted successfully
+[2024-10-10 22:36:46] Subject with ID 17 deleted successfully
+[2024-10-10 22:37:05] Form Data: sub_nameEN=Test, sub_nameTH=Test, sub_semester=1, sub_section=A, sub_department=test, sub_detail=test, exam_date=2024-10-11, exam_room=ROOM 333, exam_start=03:38, exam_end=03:41, teacher_id=19
+[2024-10-10 22:37:05] Subject inserted successfully with ID 18
+[2024-10-10 22:37:05] Exam inserted successfully for subject ID 18
+[2024-10-10 22:44:30] Form Data: sub_nameEN=2, sub_nameTH=2, sub_semester=2, sub_section=A, sub_department=2, sub_detail=2, exam_date=2024-10-11, exam_room=2, exam_year=2024, exam_start=04:44, exam_end=05:44
+[2024-10-10 22:44:30] Subject inserted successfully with ID 19
+[2024-10-10 22:44:30] Exam inserted successfully for subject ID 19
+[2024-10-10 22:46:44] Request to delete subject with ID: 19
+[2024-10-10 22:46:44] Related exams for subject with ID 19 deleted successfully
+[2024-10-10 22:46:44] Subject with ID 19 deleted successfully
+[2024-10-10 22:49:59] Form Data: sub_nameEN=test2, sub_nameTH=test2, sub_semester=1, sub_section=B, sub_department=test2, sub_detail=test2, exam_date=2024-10-11, exam_room=test2, exam_start=03:49, exam_end=03:49, teacher_id=23
+[2024-10-10 22:49:59] Subject inserted successfully with ID 20
+[2024-10-10 22:49:59] Exam inserted successfully for subject ID 20

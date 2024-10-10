@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "printing_exam";
+$dbname = "test2";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -103,7 +103,7 @@ if ($result === false) {
                             <option value="" disabled selected>Select Role</option>
                             <option value="Admin">Admin</option>
                             <option value="Teacher">Teacher</option>
-                            <option value="ExamTech">Student</option>
+                            <option value="ExamTech">Examtech</option>
                             <option value="Technology">Technology</option>
                         </select>
                         </div>

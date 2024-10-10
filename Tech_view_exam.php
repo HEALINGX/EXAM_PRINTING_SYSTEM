@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "printing_exam";
+$dbname = "test2";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -34,10 +34,12 @@ if (isset($_GET['backup_success'])) {
 
 // คำสั่ง SQL ที่ใช้ในการดึงข้อมูล
 $sql = "
-SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_start, e.exam_end, e.exam_room, e.pdf_path, e.exam_status, e.exam_year, e.exam_comment, e.exam_id
+SELECT s.sub_id, s.sub_nameEN, s.sub_semester, e.exam_date, e.exam_year, e.exam_status, e.exam_id, e.pdf_path AS exam_pdf, b.pdf_path AS backup_pdf
 FROM subject s
 JOIN exam e ON s.sub_id = e.sub_id
+LEFT JOIN backup b ON e.exam_id = b.exam_id
 ";
+
 
 $result = $conn->query($sql);
 if ($result === false) {
@@ -110,45 +112,56 @@ if ($result === false) {
     </div>
 
     <table class="table" id="userTable">
-        <thead class="thead-dark">
-            <tr>
-                <th>ID</th>
-                <th>NAME</th>
-                <th>EXAM_SEMESTER</th>
-                <th>EXAM_DATE</th>
-                <th>EXAM_YEAR</th>
-                <th>Exam Status</th>
-                <th>ACTION</th>
-            </tr>
-        </thead>
-        <tbody id="examTableBody">
-            <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    echo "<tr id='row_" . htmlspecialchars($row['sub_id']) . "'>";
-                    echo "<td>" . htmlspecialchars($row['sub_id']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_nameEN']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['exam_status']) . "</td>";
-                    echo "<td>";
-                    if (!empty($row['pdf_path'])) {  // ตรวจสอบว่ามี pdf_path หรือไม่
-                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary'>View File</a>";
-                        // แสดงปุ่ม Backup
-                        echo " <a href='backup.php?exam_id=" . htmlspecialchars($row['exam_id']) . "' class='btn btn-danger'>Backup</a>";
-                    } else {
-                        echo "<span class='text-danger'>No file available</span>";
-                    }
-                    echo "</td>";
-                    echo "</tr>";
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>NAME</th>
+            <th>EXAM_SEMESTER</th>
+            <th>EXAM_DATE</th>
+            <th>EXAM_YEAR</th>
+            <th>Exam Status</th>
+            <th>ACTION</th>
+            <th>EXAM FILE</th>
+        </tr>
+    </thead>
+    <tbody id="examTableBody">
+        <?php
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                echo "<tr id='row_" . htmlspecialchars($row['sub_id']) . "'>";
+                echo "<td>" . htmlspecialchars($row['sub_id']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['sub_nameEN']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['sub_semester']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_date']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_year']) . "</td>";
+                echo "<td>" . htmlspecialchars($row['exam_status']) . "</td>";
+                echo "<td>";
+                
+                if (!empty($row['exam_pdf'])) {
+                    echo " <a href='backup.php?exam_id=" . htmlspecialchars($row['exam_id']) . "' class='btn btn-danger'>Backup</a>";
+                } else {
+                    echo "<span class='text-danger'>No file available</span>";
                 }
-            } else {
-                echo "<tr><td colspan='6'>No exams found.</td></tr>";
+                echo "</td>";
+                
+                // เพิ่มคอลัมน์ EXAM FILE สำหรับการดึงข้อมูลจาก backup
+                echo "<td>";
+                if (!empty($row['backup_pdf'])) {
+                    echo "<a href='uploads/" . htmlspecialchars($row['backup_pdf']) . "' target='_blank' class='btn btn-info'>View Exam</a>";
+                } else {
+                    echo "<span class='text-danger'>No backup available</span>";
+                }
+                echo "</td>";
+                
+                echo "</tr>";
             }
-            ?>
-        </tbody>
-    </table>
+        } else {
+            echo "<tr><td colspan='8'>No exams found.</td></tr>"; // ปรับ colspan ให้ครอบคลุมคอลัมน์ทั้งหมด
+        }
+        ?>
+    </tbody>
+</table>
+
 </main>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
