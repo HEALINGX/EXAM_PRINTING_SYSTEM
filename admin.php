@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "test2";
+$dbname = "exam_system";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

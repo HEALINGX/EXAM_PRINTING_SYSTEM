@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "test2";
+$dbname = "exam_system";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -122,11 +122,10 @@ if ($result === false) {
                 echo "<td>
                     <button class='btn btn-success' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button>
                 </td>";
-                echo "<td style='width: 100px;'> <!-- เพิ่มความกว้างที่นี่ -->
-                    <button class='btn btn-info' onclick='window.location.href=\"print_page.php?sub_id=" . htmlspecialchars($row['sub_id']) . "\"'>
-                        <i class='fas fa-print'></i> 
-                    </button>
-                </td>";
+                echo "<td style='width: 100px;'>"; // เพิ่มความกว้างที่นี่
+                    echo "<a href='print_page.php?sub_id=" . htmlspecialchars($row['sub_id']) . "' class='btn btn-link' style='color: #6f42c1;'>";
+                    echo "<i class='bi bi-printer-fill' style='font-size: 24px;'></i></a>";
+                    echo "</td>";
                 echo "</tr>";
             }
         } else {

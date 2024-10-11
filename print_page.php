@@ -15,7 +15,7 @@ if (!isset($_GET['sub_id'])) {
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "test2";
+$dbname = "exam_system";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -58,7 +58,7 @@ $row = $result->fetch_assoc();
 
     #printPageText {
         width: 100%; /* ขนาด A4 กว้าง */
-        height: auto; /* ขนาด A4 สูง */
+        height: 100%; /* ขนาด A4 สูง */
         padding: 1cm; /* ขอบรอบเนื้อหา */
         margin: 0 auto; /* จัดกึ่งกลางแนวนอน */
         border: 1px solid black;
@@ -75,7 +75,7 @@ $row = $result->fetch_assoc();
     .header-text {
         text-align: center; /* จัดข้อความให้อยู่ตรงกลางแนวนอน */
         font-weight: bold;
-        font-size: 40px; /* เพิ่มขนาดตัวอักษรเพื่อให้ดูเด่นขึ้น */
+        font-size: 20px; /* เพิ่มขนาดตัวอักษรเพื่อให้ดูเด่นขึ้น */
         margin-bottom: 20px;
         width: 100%; /* ทำให้ข้อความขยายเต็มความกว้างของ container */
     }
@@ -122,14 +122,14 @@ $row = $result->fetch_assoc();
 
         /* ปรับขนาดตัวอักษรในโหมดพิมพ์ */
         #printPageText {
-            font-size: 12px;
+            font-size: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .header-text {
-            font-size: 20px; /* ขนาดหัวเรื่องใหญ่ขึ้น */
+            font-size: 50px; /* ขนาดหัวเรื่องใหญ่ขึ้น */
         }
     }
 </style>
@@ -144,7 +144,7 @@ $row = $result->fetch_assoc();
 <main class="container mt-5 pt-5">
     <div id="printPageText">
     <div class="header-text">
-            <img src="logo.png" alt="Logo" style="max-width: 100px; height: auto; display: block; margin: 0 auto;">
+            <img src="logo.png" alt="Logo" style="max-width: 200px; height: auto; display: block; margin: 0 auto;">
             คณะวิทยาศาสตร์
         </div>
 
@@ -172,9 +172,10 @@ $row = $result->fetch_assoc();
             <span class="left-section">ข้อสอบสำรอง.....................ชุด</span>
         </div>
 
-        <div class="content-section">
+        <div class="content-section3">
             <span class="left-section">อุปกรณ์ที่ใช้หรือคำแนะนำผู้คุมสอบเพิ่มเติม</span><br>
-            ...................................................................................................................................................................
+            ..............................................................................<br>
+            ..............................................................................
         </div>
 
         <div class="content-section">
@@ -188,18 +189,18 @@ $row = $result->fetch_assoc();
         </div>
 
         <div class="content-section">
-            <span class="left-section">รหัสนักศึกษา................................................</span>
-            <span class="right-section">ชื่อ-สกุล......................................................</span>
+            <span class="left-section">รหัสนักศึกษา.................................</span>
+            <span class="right-section">ชื่อ-สกุล.................................</span>
         </div>
 
         <div class="content-section">
-            <span class="left-section">รหัสนักศึกษา................................................</span>
-            <span class="right-section">ชื่อ-สกุล......................................................</span>
+            <span class="left-section">รหัสนักศึกษา.................................</span>
+            <span class="right-section">ชื่อ-สกุล.................................</span>
         </div>
 
         <div class="content-section">
-            <span class="left-section">รหัสนักศึกษา................................................</span>
-            <span class="right-section">ชื่อ-สกุล......................................................</span>
+            <span class="left-section">รหัสนักศึกษา.................................</span>
+            <span class="right-section">ชื่อ-สกุล.................................</span>
         </div>
 
         <div class="content-section2">

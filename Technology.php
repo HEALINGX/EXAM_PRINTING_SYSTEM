@@ -10,7 +10,7 @@ if (!isset($_SESSION["user_id"]) || !isset($_SESSION["user_role"]) || strtolower
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "test2";
+$dbname = "exam_system";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -38,6 +38,8 @@ if ($result === false) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Tech.</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="adminstyles.css"> 
 </head>
 <body>
@@ -120,12 +122,12 @@ if ($result === false) {
                     echo "<td> <button class='btn btn-success' onclick='viewComment(\"" . htmlspecialchars($row["exam_comment"]) . "\")'>View Comment</button> </td>";
                     echo "<td>";
                     if ($row['pdf_path']) {
-                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-primary' style='background-color: #6f42c1; border-color: #6f42c1;'>View File</a>";
+                        echo "<a href='uploads/" . htmlspecialchars($row['pdf_path']) . "' target='_blank' class='btn btn-link' style='color: #6f42c1;'>";
+                        echo "<i class='bi bi-printer-fill' style='font-size: 24px;'></i></a>";
                     } else {
                         echo "No file uploaded";
                     }
                     echo "</td>";
-
                     $file_path = htmlspecialchars($row['pdf_path']);
                     $full_path = __DIR__ . "/uploads/" . $file_path; 
                     if ($file_path && file_exists($full_path)) { 
